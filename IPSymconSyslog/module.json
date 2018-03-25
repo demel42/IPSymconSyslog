@@ -1,0 +1,13 @@
+{
+	"id": "{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}",
+	"name": "IPSymconSyslog",
+	"type": 3,
+	"vendor": "",
+	"aliases": [
+		"Syslog"
+	],
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "Syslog"
+}

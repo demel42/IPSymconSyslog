@@ -1,0 +1,29 @@
+{
+	"elements":
+			[
+				{ "type": "ValidationTextBox", "name": "server", "caption": "Server" },
+				{ "type": "NumberSpinner", "name": "port", "caption": "Port" },
+
+				{ "type": "Label", "label": "default settings" },
+
+				{ "type": "Label", "label": "possible values for severity: emerg, alert, crit, err, warning, notice, info, debug" },
+				{ "type": "ValidationTextBox", "name": "default_severity", "caption": "severity" },
+
+				{ "type": "Label", "label": "possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user" },
+				{ "type": "ValidationTextBox", "name": "default_facility", "caption": "facility" },
+
+				{ "type": "ValidationTextBox", "name": "default_program", "caption": "program" }
+			],
+	"actions":
+			[
+				{ "type": "Button", "label": "Testmessage", "onClick": "Syslog_TestMessage($id);" }
+			],		
+	"status":
+			[
+				{ "code": 101, "icon": "inactive", "caption": "Instance getting created" },
+				{ "code": 102, "icon": "active", "caption": "Instance is active" },
+				{ "code": 104, "icon": "inactive", "caption": "Instance is inactive" },
+
+				{ "code": 201, "icon": "error", "caption": "Instance is inactive (invalid configuration)" }
+			]
+}

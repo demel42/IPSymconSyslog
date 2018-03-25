@@ -1,4 +1,4 @@
-# NetatmoWeather
+# Syslog
 
 Modul für IP-Symcon ab Version 4.
 

@@ -19,8 +19,8 @@ Modul für IP-Symcon ab Version 4.
 
  - IPS 4.x
  - Syslog-Server
- -- Protokoll: IETF (RFC 5424)
- -- Transportschicht: UDP
+   - Protokoll: IETF (RFC 5424)
+   - Transportschicht: UDP
 
 ## 3. Installation
 

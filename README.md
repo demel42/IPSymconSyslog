@@ -75,7 +75,7 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 | Eigenschaft               | Typ      | Standardwert | Beschreibung |
 | :-----------------------: | :-----:  | :----------: | :----------------------------------------------------------------------------------------------------------: |
 | Server                    | string   |              | Hostname / IP-Adresse des Syslog-Servers |
-| Port                      | integer  | 514          | Port, unter der der Syslog-Server die Daten empfängt |
+| Port                      | integer  | 514          | Port, unter dem der Syslog-Server die Daten empfängt |
 | Schwere                   | string   | info         | Schwere (severity) der Nachricht |
 | Kategorie                 | string   | info         | Kategorie (facility) der Nachricht |
 | Programm                  | string   | info         | Programm der Nachricht |

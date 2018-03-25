@@ -40,7 +40,7 @@ class IPSymconSyslog extends IPSModule
                 }
             }
             if ($default_program == '') {
-                echo 'no value for proterty "program"';
+                echo 'no value for property "program"';
                 $ok = false;
             }
             $this->SetStatus($ok ? 102 : 201);

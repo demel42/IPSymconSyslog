@@ -62,7 +62,7 @@ class IPSymconSyslog extends IPSModule
         $default_facility = $this->ReadPropertyString('default_facility');
         $default_program = $this->ReadPropertyString('default_program');
 
-        if ($severity == null) {
+        if ($severity == null || $severity == '') {
             $severity = $default_severity;
         }
         $_severity = $this->decode_severity($severity);
@@ -71,7 +71,7 @@ class IPSymconSyslog extends IPSModule
 
             return -1;
         }
-        if ($facility == null) {
+        if ($facility == null || $facility == '') {
             $facility = $default_facility;
         }
         $_facility = $this->decode_facility($facility);
@@ -80,7 +80,7 @@ class IPSymconSyslog extends IPSModule
 
             return -1;
         }
-        if ($program == null) {
+        if ($program == null || $program == '') {
             $program = $default_program;
         }
 

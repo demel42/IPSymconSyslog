@@ -2,8 +2,6 @@
 
 class IPSymconSyslog extends IPSModule
 {
-    private $scriptName = 'Syslog';
-
     public function Create()
     {
         parent::Create();
@@ -108,7 +106,7 @@ class IPSymconSyslog extends IPSModule
             .' '
             .$msg;
 
-        $this->SendDebug($this->scriptName, "server=$server:$port, message=\"$syslog_message\"", 0);
+        $this->SendDebug(__FUNCTION__, "server=$server:$port, message=\"$syslog_message\"", 0);
 
         $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         if (!$sock) {

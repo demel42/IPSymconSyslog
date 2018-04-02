@@ -89,22 +89,22 @@ class IPSymconSyslog extends IPSModule
         $procid = '-';
         $sdata = '-';
 
-        $syslog_message = '<'.$pri.'>'
-            .'1'
-            .' '
-            .$timestamp
-            .' '
-            .$host
-            .' '
-            .$program
-            .' '
-            .$procid
-            .' '
-            .$msgid
-            .' '
-            .$sdata
-            .' '
-            .$msg;
+        $syslog_message = '<' . $pri . '>'
+            . '1'
+            . ' '
+            . $timestamp
+            . ' '
+            . $host
+            . ' '
+            . $program
+            . ' '
+            . $procid
+            . ' '
+            . $msgid
+            . ' '
+            . $sdata
+            . ' '
+            . $msg;
 
         $this->SendDebug(__FUNCTION__, "server=$server:$port, message=\"$syslog_message\"", 0);
 

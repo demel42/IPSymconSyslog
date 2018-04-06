@@ -6,12 +6,12 @@ Modul für IP-Symcon ab Version 4.
 
 **Inhaltsverzeichnis**
 
-1. [Funktionsumfang](#1-funktionsumfang)  
-2. [Voraussetzungen](#2-voraussetzungen)  
-3. [Installation](#3-installation)  
+1. [Funktionsumfang](#1-funktionsumfang)
+2. [Voraussetzungen](#2-voraussetzungen)
+3. [Installation](#3-installation)
 4. [Funktionsreferenz](#4-funktionsreferenz)
 5. [Konfiguration](#5-konfiguration)
-6. [Anhang](#6-anhang)  
+6. [Anhang](#6-anhang)
 
 ## 1. Funktionsumfang
 
@@ -29,14 +29,14 @@ Modul für IP-Symcon ab Version 4.
 Die IP-Symcon (min Ver. 4.x) Konsole öffnen. Im Objektbaum unter Kerninstanzen die Instanz __*Modules*__ durch einen doppelten Mausklick öffnen.
 
 In der _Modules_ Instanz rechts oben auf den Button __*Hinzufügen*__ drücken.
- 
+
 In dem sich öffnenden Fenster folgende URL hinzufügen:
 
 `https://github.com/demel42/IPSymconSyslog.git`
-    
-und mit _OK_ bestätigen.    
-        
-Anschließend erscheint ein Eintrag für das Modul in der Liste der Instanz _Modules_    
+
+und mit _OK_ bestätigen.
+
+Anschließend erscheint ein Eintrag für das Modul in der Liste der Instanz _Modules_
 
 ### b. Einrichtung in IPS
 
@@ -88,4 +88,7 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 
 ## 6. Anhang
 
-GUID: `{4FF4E908-F7EC-40A4-9114-A93AA5E29FAF}` 
+GUIDs
+
+- Modul: `{4FF4E908-F7EC-40A4-9114-A93AA5E29FAF}`
+- IPSymconSyslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`

@@ -91,4 +91,5 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 GUIDs
 
 - Modul: `{4FF4E908-F7EC-40A4-9114-A93AA5E29FAF}`
-- IPSymconSyslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
+- Instanzen:
+  - IPSymconSyslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`

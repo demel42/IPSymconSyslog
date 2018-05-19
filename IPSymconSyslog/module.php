@@ -1,6 +1,6 @@
 <?php
 
-class IPSymconSyslog extends IPSModule
+class Syslog extends IPSModule
 {
     public function Create()
     {

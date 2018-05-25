@@ -4,8 +4,7 @@
 	"name": "IPSymconSyslog",
 	"url": "https://github.com/demel42/IPSymconSyslog",
 	"compatibility": {
-		"version": "4.2",
-		"date": 1491343200
+		"version": "4.4"
 	},
 	"version": "1.0",
 	"build": 0,

@@ -17,7 +17,7 @@ Modul für IP-Symcon ab Version 4.4
 
 ## 2. Voraussetzungen
 
- - IPS 4.x
+ - IP-Symcon ab Version 4.4
  - Syslog-Server
    - Protokoll: IETF (RFC 5424)
    - Transportschicht: UDP
@@ -26,7 +26,7 @@ Modul für IP-Symcon ab Version 4.4
 
 ### a. Laden des Moduls
 
-Die IP-Symcon (min Ver. 4.x) Konsole öffnen. Im Objektbaum unter Kerninstanzen die Instanz __*Modules*__ durch einen doppelten Mausklick öffnen.
+Die Konsole von IP-Symcon öffnen. Im Objektbaum unter Kerninstanzen die Instanz __*Modules*__ durch einen doppelten Mausklick öffnen.
 
 In der _Modules_ Instanz rechts oben auf den Button __*Hinzufügen*__ drücken.
 

@@ -16,7 +16,9 @@
 			],
 	"actions":
 			[
-				{ "type": "Button", "label": "Testmessage", "onClick": "Syslog_TestMessage($id);" }
+				{ "type": "Button", "label": "Testmessage", "onClick": "Syslog_TestMessage($id);" },
+				{ "type": "Label", "label": "____________________________________________________________________________________________________" },
+				{ "type": "Button", "label": "Module description", "onClick": "echo 'https://github.com/demel42/IPSymconSyslog/blob/master/README.md';" }
 			],		
 	"status":
 			[

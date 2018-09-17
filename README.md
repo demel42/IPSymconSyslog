@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
 [![IPS-Version](https://img.shields.io/badge/Symcon_Version-4.4+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-1.0-blue.svg)
+![Module-Version](https://img.shields.io/badge/Modul_Version-1.1-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![StyleCI](https://github.styleci.io/repos/126683101/shield?branch=master)](https://github.styleci.io/repos/126683101)
@@ -16,6 +16,7 @@
 4. [Funktionsreferenz](#4-funktionsreferenz)
 5. [Konfiguration](#5-konfiguration)
 6. [Anhang](#6-anhang)
+7. [Versions-Historie](#7-versions-historie)
 
 ## 1. Funktionsumfang
 
@@ -97,3 +98,13 @@ GUIDs
 - Modul: `{4FF4E908-F7EC-40A4-9114-A93AA5E29FAF}`
 - Instanzen:
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
+
+## 7. Versions-Historie
+
+- 1.1 @ 17.09.2018 17:47<br>
+  Versionshistorie dazu,
+  define's der Variablentypen,
+  Schaltfläche mit Link zu README.md im Konfigurationsdialog
+
+- 1.0 @ 25.03.2018 10:07<br>
+  Initiale Version

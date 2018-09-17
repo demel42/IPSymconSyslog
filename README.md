@@ -102,9 +102,9 @@ GUIDs
 ## 7. Versions-Historie
 
 - 1.1 @ 17.09.2018 17:47<br>
-  Versionshistorie dazu,
-  define's der Variablentypen,
-  Schaltfläche mit Link zu README.md im Konfigurationsdialog
+  - Versionshistorie dazu,
+  - define's der Variablentypen,
+  - Schaltfläche mit Link zu README.md im Konfigurationsdialog
 
 - 1.0 @ 25.03.2018 10:07<br>
   Initiale Version

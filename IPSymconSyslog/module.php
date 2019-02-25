@@ -36,11 +36,11 @@ class Syslog extends IPSModule
         $this->RegisterPropertyString('server', '');
         $this->RegisterPropertyInteger('port', '514');
         $this->RegisterPropertyString('default_severity', 'info');
-		if (defined('LOG_LOCAL0')) {
-			$this->RegisterPropertyString('default_facility', 'local0');
-		} else {
-			$this->RegisterPropertyString('default_facility', 'user');
-		}
+        if (defined('LOG_LOCAL0')) {
+            $this->RegisterPropertyString('default_facility', 'local0');
+        } else {
+            $this->RegisterPropertyString('default_facility', 'user');
+        }
         $this->RegisterPropertyString('default_program', 'ipsymcon');
 
         $this->RegisterPropertyInteger('update_interval', '0');
@@ -378,24 +378,24 @@ class Syslog extends IPSModule
 
     private function decode_facility($str)
     {
-		if (defined('LOG_LOCAL0')) {
-			$str2facility = [
-					'auth'    => LOG_AUTH,
-					'local0'  => LOG_LOCAL0,
-					'local1'  => LOG_LOCAL1,
-					'local2'  => LOG_LOCAL2,
-					'local3'  => LOG_LOCAL3,
-					'local4'  => LOG_LOCAL4,
-					'local5'  => LOG_LOCAL5,
-					'local6'  => LOG_LOCAL6,
-					'local7'  => LOG_LOCAL7,
-				];
-		} else {
-			$str2facility = [
+        if (defined('LOG_LOCAL0')) {
+            $str2facility = [
+                    'auth'    => LOG_AUTH,
+                    'local0'  => LOG_LOCAL0,
+                    'local1'  => LOG_LOCAL1,
+                    'local2'  => LOG_LOCAL2,
+                    'local3'  => LOG_LOCAL3,
+                    'local4'  => LOG_LOCAL4,
+                    'local5'  => LOG_LOCAL5,
+                    'local6'  => LOG_LOCAL6,
+                    'local7'  => LOG_LOCAL7,
+                ];
+        } else {
+            $str2facility = [
                 'auth'    => LOG_AUTH,
                 'user'    => LOG_USER,
-				];
-		}
+                ];
+        }
 
         $str = strtolower($str);
         foreach ($str2facility as $key => $val) {

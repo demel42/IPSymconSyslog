@@ -378,9 +378,9 @@ class Syslog extends IPSModule
 
     private function decode_facility($str)
     {
-        $str2facility = [
-                'auth'    => LOG_AUTH,
-				if (defined('LOG_LOCAL0')) {
+		if (defined('LOG_LOCAL0')) {
+			$str2facility = [
+					'auth'    => LOG_AUTH,
 					'local0'  => LOG_LOCAL0,
 					'local1'  => LOG_LOCAL1,
 					'local2'  => LOG_LOCAL2,
@@ -389,9 +389,13 @@ class Syslog extends IPSModule
 					'local5'  => LOG_LOCAL5,
 					'local6'  => LOG_LOCAL6,
 					'local7'  => LOG_LOCAL7,
-				}
+				];
+		} else {
+			$str2facility = [
+                'auth'    => LOG_AUTH,
                 'user'    => LOG_USER,
-            ];
+				];
+		}
 
         $str = strtolower($str);
         foreach ($str2facility as $key => $val) {

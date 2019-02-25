@@ -13,8 +13,19 @@
 				"mögliche Werte für die Kategorie (facility): auth, local0, local1, local2, local3, local4, local5, local6, local7, user",
 			"program": "Programm",
 
+			"transfer IPS-messages to syslog": "IPS-Meldungen zum Syslog-Server übertragen",
+
 			"Check messages every X seconds": "Prüfe Nachrichten alle X Sekunden",
 			"Seconds": "Sekunden",
+
+			 "with message-type ...": "mit Nachrichten-Typ ...",
+			 " ... ERROR": " ... ERROR",
+			 " ... WARNING": " ... WARNING",
+			 " ... SUCCESS": " ... SUCCESS",
+			 " ... MESSAGE": " ... MESSAGE",
+			 " ... NOTIFY": " ... NOTIFY",
+			 " ... CUSTOM": " ... CUSTOM",
+			 " ... DEBUG": " ... DEBUG",
 
 			"Testmessage": "Testnachricht",
 			"Check messages": "Prüfe Nachrichten",

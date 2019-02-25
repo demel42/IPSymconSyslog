@@ -41,6 +41,14 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyInteger('update_interval', '0');
 
+		$this->RegisterPropertyBoolean('with_KL_MESSAGE', false);
+		$this->RegisterPropertyBoolean('with_KL_SUCCESS', false);
+		$this->RegisterPropertyBoolean('with_KL_NOTIFY', false);
+		$this->RegisterPropertyBoolean('with_KL_WARNING', false);
+		$this->RegisterPropertyBoolean('with_KL_ERROR', false);
+		$this->RegisterPropertyBoolean('with_KL_DEBUG', false);
+		$this->RegisterPropertyBoolean('with_KL_CUSTOM', false);
+
         $this->RegisterTimer('CheckMessages', 0, 'Syslog_CheckMessages(' . $this->InstanceID . ');');
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
@@ -52,7 +60,7 @@ class Syslog extends IPSModule
         $vpos = 0;
 
         $this->MaintainVariable('LastMessage', $this->Translate('Timestamp of last message'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
-        $this->MaintainVariable('LastUpdate', $this->Translate('Last update'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
+        $this->MaintainVariable('LastCycle', $this->Translate('Last cycle'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
 
         $syslog_server = $this->ReadPropertyString('server');
         $syslog_port = $this->ReadPropertyInteger('port');
@@ -97,8 +105,18 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'Label', 'label' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_facility', 'caption' => 'facility'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_program', 'caption' => 'program'];
+		$formElements[] = ['type' => 'Label', 'label' => ''];
+        $formElements[] = ['type' => 'Label', 'label' => 'transfer IPS-messages to syslog'];
         $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
         $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
+        $formElements[] = ['type' => 'Label', 'label' => 'with message-type ...'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_ERROR', 'caption' => ' ... ERROR'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_WARNING', 'caption' => ' ... WARNING'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_SUCCESS', 'caption' => ' ... SUCCESS'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_MESSAGE', 'caption' => ' ... MESSAGE'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_NOTIFY', 'caption' => ' ... NOTIFY'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_CUSTOM', 'caption' => ' ... CUSTOM'];
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_DEBUG', 'caption' => ' ... DEBUG'];
 
         $formActions = [];
         $formActions[] = ['type' => 'Button', 'label' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
@@ -147,6 +165,14 @@ class Syslog extends IPSModule
 
     public function CheckMessages()
     {
+        $with_KL_MESSAGE = $this->ReadPropertyBoolean('with_KL_MESSAGE');
+        $with_KL_SUCCESS = $this->ReadPropertyBoolean('with_KL_SUCCESS');
+        $with_KL_NOTIFY = $this->ReadPropertyBoolean('with_KL_NOTIFY');
+        $with_KL_WARNING = $this->ReadPropertyBoolean('with_KL_WARNING');
+        $with_KL_ERROR = $this->ReadPropertyBoolean('with_KL_ERROR');
+        $with_KL_DEBUG = $this->ReadPropertyBoolean('with_KL_DEBUG');
+        $with_KL_CUSTOM = $this->ReadPropertyBoolean('with_KL_CUSTOM');
+
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
             $this->InitialSnapshot();
@@ -185,22 +211,7 @@ class Syslog extends IPSModule
                     $text = $Data[1];
                     $tstamp = $Data[2];
                     break;
-/*
-                case 10601:
-                case 10602:
-                case 10603:
-                    $sender = 'VariableManager';
-                    @$name = IPS_GetLocation($SenderID);
-                    if ($name == false) {
-                        $name = 'unbekanntes Objekt #' . $SenderID;
-                        $this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
-                    }
-                    $text = '[' . $name . '] = ' . $Data['0'];
-                    $tstamp = $Data[3];
-                    break;
-*/
                 default:
-                    // $this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
                     break;
             }
 
@@ -216,20 +227,30 @@ class Syslog extends IPSModule
             $severity = '';
             switch ($Message) {
                 case KL_ERROR:
+                    if ($with_KL_ERROR)
                     $severity = 'error';
                     break;
                 case KL_WARNING:
+                    if ($with_KL_WARNING)
                     $severity = 'warning';
                     break;
                 case KL_MESSAGE:
+                    if ($with_KL_MESSAGE)
+                    $severity = 'info';
+                    break;
                 case KL_CUSTOM:
+                    if ($with_KL_CUSTOM)
                     $severity = 'info';
                     break;
                 case KL_SUCCESS:
+                    if ($with_KL_SUCCESS)
+                    $severity = 'notice';
                 case KL_NOTIFY:
+                    if ($with_KL_NOTIFY)
                     $severity = 'notice';
                     break;
                 case KL_DEBUG:
+                    if ($with_KL_DEBUG)
                     $severity = 'debug';
                     break;
                 default:
@@ -237,8 +258,6 @@ class Syslog extends IPSModule
                     break;
             }
             if ($severity != '') {
-                $this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
-                $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', severity=' . $severity, 0);
                 $this->Message($text, $severity);
             }
         }
@@ -246,7 +265,7 @@ class Syslog extends IPSModule
         $this->SetBuffer('TimeStamp', $TimeStamp);
 
         $this->SetValue('LastMessage', $last_tstamp);
-        $this->SetValue('LastUpdate', time());
+        $this->SetValue('LastCycle', time());
     }
 
     public function TestMessage()

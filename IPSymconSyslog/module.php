@@ -41,13 +41,13 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyInteger('update_interval', '0');
 
-		$this->RegisterPropertyBoolean('with_KL_MESSAGE', false);
-		$this->RegisterPropertyBoolean('with_KL_SUCCESS', false);
-		$this->RegisterPropertyBoolean('with_KL_NOTIFY', false);
-		$this->RegisterPropertyBoolean('with_KL_WARNING', false);
-		$this->RegisterPropertyBoolean('with_KL_ERROR', false);
-		$this->RegisterPropertyBoolean('with_KL_DEBUG', false);
-		$this->RegisterPropertyBoolean('with_KL_CUSTOM', false);
+        $this->RegisterPropertyBoolean('with_KL_MESSAGE', false);
+        $this->RegisterPropertyBoolean('with_KL_SUCCESS', false);
+        $this->RegisterPropertyBoolean('with_KL_NOTIFY', false);
+        $this->RegisterPropertyBoolean('with_KL_WARNING', false);
+        $this->RegisterPropertyBoolean('with_KL_ERROR', false);
+        $this->RegisterPropertyBoolean('with_KL_DEBUG', false);
+        $this->RegisterPropertyBoolean('with_KL_CUSTOM', false);
 
         $this->RegisterTimer('CheckMessages', 0, 'Syslog_CheckMessages(' . $this->InstanceID . ');');
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -105,7 +105,7 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'Label', 'label' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_facility', 'caption' => 'facility'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_program', 'caption' => 'program'];
-		$formElements[] = ['type' => 'Label', 'label' => ''];
+        $formElements[] = ['type' => 'Label', 'label' => ''];
         $formElements[] = ['type' => 'Label', 'label' => 'transfer IPS-messages to syslog'];
         $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
         $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
@@ -227,31 +227,38 @@ class Syslog extends IPSModule
             $severity = '';
             switch ($Message) {
                 case KL_ERROR:
-                    if ($with_KL_ERROR)
-                    $severity = 'error';
+                    if ($with_KL_ERROR) {
+                        $severity = 'error';
+                    }
                     break;
                 case KL_WARNING:
-                    if ($with_KL_WARNING)
-                    $severity = 'warning';
+                    if ($with_KL_WARNING) {
+                        $severity = 'warning';
+                    }
                     break;
                 case KL_MESSAGE:
-                    if ($with_KL_MESSAGE)
-                    $severity = 'info';
+                    if ($with_KL_MESSAGE) {
+                        $severity = 'info';
+                    }
                     break;
                 case KL_CUSTOM:
-                    if ($with_KL_CUSTOM)
-                    $severity = 'info';
+                    if ($with_KL_CUSTOM) {
+                        $severity = 'info';
+                    }
                     break;
                 case KL_SUCCESS:
-                    if ($with_KL_SUCCESS)
-                    $severity = 'notice';
+                    if ($with_KL_SUCCESS) {
+                        $severity = 'notice';
+                    }
                 case KL_NOTIFY:
-                    if ($with_KL_NOTIFY)
-                    $severity = 'notice';
+                    if ($with_KL_NOTIFY) {
+                        $severity = 'notice';
+                    }
                     break;
                 case KL_DEBUG:
-                    if ($with_KL_DEBUG)
-                    $severity = 'debug';
+                    if ($with_KL_DEBUG) {
+                        $severity = 'debug';
+                    }
                     break;
                 default:
                     $severity = '';

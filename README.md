@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
-[![IPS-Version](https://img.shields.io/badge/Symcon_Version-4.4+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-1.1-blue.svg)
+[![IPS-Version](https://img.shields.io/badge/Symcon_Version-5.0+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+![Module-Version](https://img.shields.io/badge/Modul_Version-2.1-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![StyleCI](https://github.styleci.io/repos/126683101/shield?branch=master)](https://github.styleci.io/repos/126683101)
@@ -22,7 +22,7 @@
 
 ## 2. Voraussetzungen
 
- - IP-Symcon ab Version 4.4
+ - IP-Symcon ab Version 5.x
  - Syslog-Server
    - Protokoll: IETF (RFC 5424)
    - Transportschicht: UDP
@@ -84,11 +84,14 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 | Schwere                   | string   | info         | Schwere (severity) der Nachricht |
 | Kategorie                 | string   | info         | Kategorie (facility) der Nachricht |
 | Programm                  | string   | info         | Programm der Nachricht |
+|                           |          |              | |
+| Aktualisiere Daten ...    | integer  | 10           | Aktualisierungsintervall, Angabe in Sekunden |
 
 ### Schaltflächen
 
 | Bezeichnung                  | Beschreibung |
 | :--------------------------: | :------------------------------------------------: |
+| Übertrage Nachrichten        | führt eine sofortige Aktualisierung durch |
 | Testnachricht                | Sendet eine Testnachricht |
 
 ## 6. Anhang
@@ -100,6 +103,9 @@ GUIDs
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
 
 ## 7. Versions-Historie
+
+- 2.1 @ 25.02.2019 16:41<br>
+  - Protokllierung aller IPS-Messages ...
 
 - 1.1 @ 17.09.2018 17:47<br>
   - Versionshistorie dazu,

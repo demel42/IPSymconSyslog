@@ -1,5 +1,32 @@
 <?php
 
+if (!defined('KL_MESSAGE')) {
+    define('IPS_BASE', 10000);
+	// --- KERNEL LOGMESSAGE
+	define('IPS_LOGMESSAGE', IPS_BASE + 200);           // Logmessage Message
+	define('KL_MESSAGE', IPS_LOGMESSAGE + 1);           // Normal Message
+	define('KL_SUCCESS', IPS_LOGMESSAGE + 2);           // Success Message
+	define('KL_NOTIFY', IPS_LOGMESSAGE + 3);            // Notiy about Changes
+	define('KL_WARNING', IPS_LOGMESSAGE + 4);           // Warnings
+	define('KL_ERROR', IPS_LOGMESSAGE + 5);             // Error Message
+	define('KL_DEBUG', IPS_LOGMESSAGE + 6);             // Debug Informations + Script Results
+	define('KL_CUSTOM', IPS_LOGMESSAGE + 7);            // User Message
+}
+
+if (!defined('IS_SBASE')) {
+	define('IS_SBASE', 100);							// Wertebasis für Status Codes
+	define('IS_CREATING', IS_SBASE + 1);				// Instanz wurde erstellt
+	define('IS_ACTIVE', IS_SBASE + 2);					// Instanz wurde erstellt und ist aktiv
+	define('IS_DELETING', IS_SBASE + 3);				// Instanz wurde gelöscht
+	define('IS_INACTIVE', IS_SBASE + 4);				// Instanz wird nicht benutzt
+	define('IS_NOTCREATED', IS_SBASE + 5);				// Instanz wurde nicht erstellt
+	define('IS_EBASE', 200);							// Base Message
+}
+
+if (!defined('IS_INVALIDCONFIG')) {
+    define('IS_INVALIDCONFIG', IS_EBASE + 1);
+}
+
 class Syslog extends IPSModule
 {
     public function Create()
@@ -11,11 +38,21 @@ class Syslog extends IPSModule
         $this->RegisterPropertyString('default_severity', 'info');
         $this->RegisterPropertyString('default_facility', 'local0');
         $this->RegisterPropertyString('default_program', 'ipsymcon');
+
+		$this->RegisterPropertyInteger('update_interval', '0');
+
+		$this->RegisterTimer('CheckMessages', 0, 'Syslog_CheckMessages(' . $this->InstanceID . ');');
+		$this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     public function ApplyChanges()
     {
         parent::ApplyChanges();
+
+		$vpos = 0;
+
+		$this->MaintainVariable('LastMessage', $this->Translate('Timestamp of last message'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
+		$this->MaintainVariable('LastUpdate', $this->Translate('Last update'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
 
         $syslog_server = $this->ReadPropertyString('server');
         $syslog_port = $this->ReadPropertyInteger('port');
@@ -41,11 +78,173 @@ class Syslog extends IPSModule
                 echo 'no value for property "program"';
                 $ok = false;
             }
-            $this->SetStatus($ok ? 102 : 201);
+            $this->SetStatus($ok ? IS_ACTIVE : IS_INVALIDCONFIG);
         } else {
-            $this->SetStatus(104);
+            $this->SetStatus(IS_INACTIVE);
         }
+
+		$this->SetUpdateInterval();
     }
+
+
+	public function GetConfigurationForm()
+    {
+		$formElements = [];
+		$formElements[] = ['type' => 'ValidationTextBox', 'name' => 'server', 'caption' => 'Server'];
+		$formElements[] = ['type' => 'NumberSpinner', 'name' => 'port', 'caption' => 'Port'];
+		$formElements[] = ['type' => 'Label', 'label' => 'default settings'];
+		$formElements[] = ['type' => 'Label', 'label' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'];
+		$formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_severity', 'caption' => 'severity'];
+		$formElements[] = ['type' => 'Label', 'label' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
+		$formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_facility', 'caption' => 'facility'];
+		$formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_program', 'caption' => 'program'];
+		$formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
+		$formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
+
+        $formActions = [];
+        $formActions[] = ['type' => 'Button', 'label' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
+		$formActions[] = ['type' => 'Button', 'label' => 'Check messages', 'onClick' => 'Syslog_CheckMessages($id);'];
+        $formActions[] = ['type' => 'Label', 'label' => '____________________________________________________________________________________________________'];
+        $formActions[] = [
+                            'type'    => 'Button',
+                            'caption' => 'Module description',
+                            'onClick' => 'echo "https://github.com/demel42/IPSymconSyslog/blob/master/README.md";'
+                        ];
+
+        $formStatus = [];
+        $formStatus[] = ['code' => IS_CREATING, 'icon' => 'inactive', 'caption' => 'Instance getting created'];
+        $formStatus[] = ['code' => IS_ACTIVE, 'icon' => 'active', 'caption' => 'Instance is active'];
+        $formStatus[] = ['code' => IS_DELETING, 'icon' => 'inactive', 'caption' => 'Instance is deleted'];
+        $formStatus[] = ['code' => IS_INACTIVE, 'icon' => 'inactive', 'caption' => 'Instance is inactive'];
+        $formStatus[] = ['code' => IS_NOTCREATED, 'icon' => 'inactive', 'caption' => 'Instance is not created'];
+
+        $formStatus[] = ['code' => IS_INVALIDCONFIG, 'icon' => 'error', 'caption' => 'Instance is inactive (invalid configuration)'];
+
+		return json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
+	}
+
+	public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+	{
+		parent::MessageSink($TimeStamp, $SenderID, $Message, $Data);
+
+		if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
+			$this->InitialSnapshot();
+		}
+	}
+
+	protected function SetUpdateInterval()
+	{
+		$sec = $this->ReadPropertyInteger('update_interval');
+		$msec = $sec > 0 ? $sec * 1000 : 0;
+		$this->SetTimerInterval('CheckMessages', $msec);
+	}
+
+	protected function InitialSnapshot()
+	{
+		$r = IPS_GetSnapshotChanges(0);
+		$snapshot = json_decode($r, true);
+		$this->SetBuffer('TimeStamp', $snapshot[0]['TimeStamp']);
+	}
+
+	public function CheckMessages()
+	{
+		$TimeStamp = $this->GetBuffer('TimeStamp');
+		if ($TimeStamp == '' || $TimeStamp == 0) {
+			$this->InitialSnapshot();
+			$TimeStamp = $this->GetBuffer('TimeStamp');
+		}
+
+		$this->SendDebug(__FUNCTION__, 'start cycle with TimeStamp=' . $TimeStamp, 0);
+
+		$r = IPS_GetSnapshotChanges($TimeStamp);
+		$snapshot = json_decode($r, true);
+
+		$last_tstamp = 0;
+		foreach ($snapshot as $obj) {
+			$SenderID = $obj['SenderID'];
+			$TimeStamp = $obj['TimeStamp'];
+			$Message = $obj['Message'];
+			$Data = $obj['Data'];
+			
+			if ($SenderID == $this->InstanceID) continue;
+
+			$sender = '';
+			$text = '';
+			$tstamp = 0;
+			
+			switch ($Message) {
+				case KL_MESSAGE:
+				case KL_SUCCESS:
+				case KL_NOTIFY:
+				case KL_WARNING:
+				case KL_ERROR:
+				case KL_DEBUG:
+				case KL_CUSTOM:
+					$sender = $Data[0];
+					$text = $Data[1];
+					$tstamp = $Data[2];
+					break;
+/*
+				case 10601:
+				case 10602:
+				case 10603:
+					$sender = 'VariableManager';
+					@$name = IPS_GetLocation($SenderID);
+					if ($name == false) {
+						$name = 'unbekanntes Objekt #' . $SenderID;
+						$this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
+					}
+					$text = '[' . $name . '] = ' . $Data['0'];
+					$tstamp = $Data[3];
+					break;
+*/
+				default:
+					// $this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
+					break;
+			}
+
+			if ($sender == '') continue;
+
+			$last_tstamp = $tstamp;
+
+			$ts = date('d.m.Y H:i:s', $tstamp);
+			$this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', text=' . utf8_decode($text) . ', tstamp=' . $ts, 0);
+			
+			$severity = '';
+			switch ($Message) {
+				case KL_ERROR:
+					$severity = 'error';
+					break;
+				case KL_WARNING:
+					$severity = 'warning';
+					break;
+				case KL_MESSAGE:
+				case KL_CUSTOM:
+					$severity = 'info';
+					break;
+				case KL_SUCCESS:
+				case KL_NOTIFY:
+					$severity = 'notice';
+					break;
+				case KL_DEBUG:
+					$severity = 'debug';
+					break;
+				default:
+					$severity = '';
+					break;
+			}
+			if ($severity != '') {
+				$this->SendDebug(__FUNCTION__, 'obj=' . print_r($obj, true), 0);
+				$this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', severity=' . $severity, 0);
+				$this->Message($text, $severity);
+			}
+		}
+
+		$this->SetBuffer('TimeStamp', $TimeStamp);
+
+		$this->SetValue('LastMessage', $last_tstamp);
+		$this->SetValue('LastUpdate', time());
+	}
 
     public function TestMessage()
     {

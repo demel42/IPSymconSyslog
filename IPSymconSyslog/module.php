@@ -195,13 +195,13 @@ class Syslog extends IPSModule
         $this->SendDebug(__FUNCTION__, 'start cycle with TimeStamp=' . $TimeStamp, 0);
 
         @$r = IPS_GetSnapshotChanges($TimeStamp);
-		if ($r == '') {
+        if ($r == '') {
             $this->SetStatus(IS_BUFFEROVERRUN);
-			rezurn;
-		}
-		$this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
+            rezurn;
+        }
+        $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
         $snapshot = json_decode($r, true);
-		$this->SendDebug(__FUNCTION__, 'size of array=' . sizeof($snapshot), 0);
+        $this->SendDebug(__FUNCTION__, 'size of array=' . count($snapshot), 0);
 
         $last_tstamp = 0;
         foreach ($snapshot as $obj) {

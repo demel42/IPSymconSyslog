@@ -197,7 +197,7 @@ class Syslog extends IPSModule
         @$r = IPS_GetSnapshotChanges($TimeStamp);
         if ($r == '') {
             $this->SetStatus(IS_BUFFEROVERRUN);
-            rezurn;
+            return;
         }
         $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
         $snapshot = json_decode($r, true);

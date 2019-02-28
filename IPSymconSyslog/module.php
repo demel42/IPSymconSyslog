@@ -25,6 +25,14 @@ if (!defined('IS_SBASE')) {
 
 if (!defined('IS_INVALIDCONFIG')) {
     define('IS_INVALIDCONFIG', IS_EBASE + 1);
+    define('IS_BUFFEROVERRUN', IS_EBASE + 2);
+}
+
+if (!defined('VARIABLETYPE_BOOLEAN')) {
+    define('VARIABLETYPE_BOOLEAN', 0);
+    define('VARIABLETYPE_INTEGER', 1);
+    define('VARIABLETYPE_FLOAT', 2);
+    define('VARIABLETYPE_STRING', 3);
 }
 
 class Syslog extends IPSModule
@@ -140,6 +148,7 @@ class Syslog extends IPSModule
         $formStatus[] = ['code' => IS_NOTCREATED, 'icon' => 'inactive', 'caption' => 'Instance is not created'];
 
         $formStatus[] = ['code' => IS_INVALIDCONFIG, 'icon' => 'error', 'caption' => 'Instance is inactive (invalid configuration)'];
+        $formStatus[] = ['code' => IS_BUFFEROVERRUN, 'icon' => 'error', 'caption' => 'Instance is inactive (buffer overrun)'];
 
         return json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
     }
@@ -185,8 +194,14 @@ class Syslog extends IPSModule
 
         $this->SendDebug(__FUNCTION__, 'start cycle with TimeStamp=' . $TimeStamp, 0);
 
-        $r = IPS_GetSnapshotChanges($TimeStamp);
+        @$r = IPS_GetSnapshotChanges($TimeStamp);
+		if ($r == '') {
+            $this->SetStatus(IS_BUFFEROVERRUN);
+			rezurn;
+		}
+		$this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
         $snapshot = json_decode($r, true);
+		$this->SendDebug(__FUNCTION__, 'size of array=' . sizeof($snapshot), 0);
 
         $last_tstamp = 0;
         foreach ($snapshot as $obj) {

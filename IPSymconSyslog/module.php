@@ -404,12 +404,12 @@ class Syslog extends IPSModule
                     'local5'  => LOG_LOCAL5,
                     'local6'  => LOG_LOCAL6,
                     'local7'  => LOG_LOCAL7,
-					'user'    => LOG_USER,
+                    'user'    => LOG_USER,
                 ];
         } else {
             $str2facility = [
-					'auth'    => LOG_AUTH,
-					'user'    => LOG_USER,
+                    'auth'    => LOG_AUTH,
+                    'user'    => LOG_USER,
                 ];
         }
 

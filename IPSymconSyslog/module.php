@@ -241,7 +241,9 @@ class Syslog extends IPSModule
             $last_tstamp = $tstamp;
 
             $ts = date('d.m.Y H:i:s', $tstamp);
-            $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', text=' . utf8_decode($text) . ', tstamp=' . $ts, 0);
+			$n_txt = strlen($text);
+			$txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
+            $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
 
             $severity = '';
             switch ($Message) {
@@ -284,7 +286,7 @@ class Syslog extends IPSModule
                     break;
             }
             if ($severity != '') {
-                $this->Message($text, $severity);
+                $this->Message($txt, $severity);
             }
         }
 

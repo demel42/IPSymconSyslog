@@ -241,8 +241,8 @@ class Syslog extends IPSModule
             $last_tstamp = $tstamp;
 
             $ts = date('d.m.Y H:i:s', $tstamp);
-			$n_txt = strlen($text);
-			$txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
+            $n_txt = strlen($text);
+            $txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
             $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
 
             $severity = '';

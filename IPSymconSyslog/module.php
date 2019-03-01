@@ -40,7 +40,7 @@ if (!defined('VARIABLETYPE_BOOLEAN')) {
 
 class Syslog extends IPSModule
 {
-	use SyslogCommon;
+    use SyslogCommon;
 
     public function Create()
     {
@@ -235,18 +235,18 @@ class Syslog extends IPSModule
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
         if ($sdata == '') {
             $this->SendDebug(__FUNCTION__, 'unable to get snapshot, resetting', 0);
-			$this->LogMessage('unable to get snapshot, resetting', KL_NOTIFY);
+            $this->LogMessage('unable to get snapshot, resetting', KL_NOTIFY);
             $this->InitialSnapshot();
             $this->SetStatus(IS_NOSNAPSHOT);
             return;
         }
         $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($sdata), 0);
-		$udata = utf8_encode($sdata);
+        $udata = utf8_encode($sdata);
         $snapshot = json_decode($udata, true);
         if ($snapshot == '') {
-			$txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;
+            $txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;
             $this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', data=' . $txt . '...', 0);
-			$this->LogMessage('unable to decode json-data, error=' . json_last_error(), KL_NOTIFY);
+            $this->LogMessage('unable to decode json-data, error=' . json_last_error(), KL_NOTIFY);
             $this->SetStatus(IS_BADDATA);
             return;
         }
@@ -309,7 +309,7 @@ class Syslog extends IPSModule
                     if (preg_match($expr, $sender)) {
                         // $this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', sender=' . $sender . ' => suppress', 0);
                         $sender = '';
-						break;
+                        break;
                     }
                 }
             }
@@ -329,7 +329,7 @@ class Syslog extends IPSModule
                     if (preg_match($expr, $text)) {
                         // $this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', text=' . $text . ' => suppress', 0);
                         $text = '';
-						break;
+                        break;
                     }
                 }
             }
@@ -361,7 +361,7 @@ class Syslog extends IPSModule
             $this->SetValue('LastMessage', $last_tstamp);
             $this->SetValue('LastCycle', time());
         }
-		$this->SetStatus(IS_ACTIVE);
+        $this->SetStatus(IS_ACTIVE);
     }
 
     public function TestMessage()

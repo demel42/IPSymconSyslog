@@ -235,17 +235,17 @@ class Syslog extends IPSModule
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
         if ($sdata == '') {
             $this->SetStatus(IS_NOSNAPSHOT);
-			$old_ts = $TimeStamp;
+            $old_ts = $TimeStamp;
             $this->InitialSnapshot();
-			$TimeStamp = $this->GetBuffer('TimeStamp');
+            $TimeStamp = $this->GetBuffer('TimeStamp');
             $this->SendDebug(__FUNCTION__, 'unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', 0);
             $this->LogMessage('unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', KL_NOTIFY);
-			$sdata = @IPS_GetSnapshotChanges($TimeStamp);
-			if ($sdata == '') {
-				$this->SendDebug(__FUNCTION__, 'unable to get snapshot (#' . $TimeStamp . '), reset failed', 0);
-				$this->LogMessage('unable to get snapshot (#' . $TimeStamp . ') , reset failed', KL_NOTIFY);
-				return;
-			}
+            $sdata = @IPS_GetSnapshotChanges($TimeStamp);
+            if ($sdata == '') {
+                $this->SendDebug(__FUNCTION__, 'unable to get snapshot (#' . $TimeStamp . '), reset failed', 0);
+                $this->LogMessage('unable to get snapshot (#' . $TimeStamp . ') , reset failed', KL_NOTIFY);
+                return;
+            }
         }
         $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($sdata), 0);
         $udata = utf8_encode($sdata);

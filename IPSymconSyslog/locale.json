@@ -18,14 +18,16 @@
 			"Check messages every X seconds": "Prüfe Nachrichten alle X Sekunden",
 			"Seconds": "Sekunden",
 
-			 "with message-type ...": "mit Nachrichten-Typ ...",
-			 " ... ERROR": " ... ERROR",
-			 " ... WARNING": " ... WARNING",
-			 " ... SUCCESS": " ... SUCCESS",
-			 " ... MESSAGE": " ... MESSAGE",
-			 " ... NOTIFY": " ... NOTIFY",
-			 " ... CUSTOM": " ... CUSTOM",
-			 " ... DEBUG": " ... DEBUG",
+			"Name": "Bezeichnung",
+			"Active": "aktiv",
+			"Messagetyp is active": "Nachrichtentyp ist aktiv",
+			"Active messages": "aktive Nachrichten",
+
+			"Field": "Feld",
+			"Regular expression for named field": "Regulärer Ausdruck für das angegebene Feld",
+			"Exclude filter": "Ausschluss-Filter",
+
+			"Variables for Timestamps": "Variablen für Zeitstempel",
 
 			"Testmessage": "Testnachricht",
 			"Check messages": "Prüfe Nachrichten",
@@ -38,7 +40,9 @@
 			"Instance is active": "Instanz ist aktiv",
 			"Instance is inactive": "Instanz ist inaktiv",
 
-			"Instance is inactive (invalid configuration)": "Instanz ist inaktiv (ungültige Konfiguration)"
+			"Instance is inactive (invalid configuration)": "Instanz ist inaktiv (ungültige Konfiguration)",
+			"Instance is inactive (no snapshot)": "Instanz ist inaktiv (kein Snapshot)",
+			"Instance is inactive (bad data)": "Instanz ist inaktiv (Daten fehlerhaft)"
 		}
 	}
 }

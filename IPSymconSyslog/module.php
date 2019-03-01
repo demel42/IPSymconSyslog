@@ -25,7 +25,8 @@ if (!defined('IS_SBASE')) {
 
 if (!defined('IS_INVALIDCONFIG')) {
     define('IS_INVALIDCONFIG', IS_EBASE + 1);
-    define('IS_BUFFEROVERRUN', IS_EBASE + 2);
+    define('IS_NOSNAPSHOT', IS_EBASE + 2);
+    define('IS_BADDATA', IS_EBASE + 3);
 }
 
 if (!defined('VARIABLETYPE_BOOLEAN')) {
@@ -53,13 +54,22 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyInteger('update_interval', '0');
 
-        $this->RegisterPropertyBoolean('with_KL_MESSAGE', false);
-        $this->RegisterPropertyBoolean('with_KL_SUCCESS', false);
-        $this->RegisterPropertyBoolean('with_KL_NOTIFY', false);
-        $this->RegisterPropertyBoolean('with_KL_WARNING', false);
-        $this->RegisterPropertyBoolean('with_KL_ERROR', false);
-        $this->RegisterPropertyBoolean('with_KL_DEBUG', false);
-        $this->RegisterPropertyBoolean('with_KL_CUSTOM', false);
+		$msgtypes = [
+				['msgtype' => KL_MESSAGE, 'title' => 'MESSAGE', 'active' => true],
+				['msgtype' => KL_SUCCESS, 'title' => 'SUCCESS', 'active' => true],
+				['msgtype' => KL_NOTIFY, 'title' => 'NOTIFY', 'active' => true],
+				['msgtype' => KL_WARNING, 'title' => 'WARNING', 'active' => true],
+				['msgtype' => KL_ERROR, 'title' => 'ERROR', 'active' => true],
+				['msgtype' => KL_DEBUG, 'title' => 'DEBUG', 'active' => false],
+				['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
+			];
+        $this->RegisterPropertyString('msgtypes', json_encode($msgtypes));
+		$exclude_filters = [
+				['field' => 'Sender', 'expression' => 'VariableManager'],
+			];
+        $this->RegisterPropertyString('exclude_filters', json_encode($exclude_filters));
+
+        $this->RegisterPropertyBoolean('with_tstamp_vars', false);
 
         $this->RegisterTimer('CheckMessages', 0, 'Syslog_CheckMessages(' . $this->InstanceID . ');');
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -69,10 +79,12 @@ class Syslog extends IPSModule
     {
         parent::ApplyChanges();
 
+        $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
+
         $vpos = 0;
 
-        $this->MaintainVariable('LastMessage', $this->Translate('Timestamp of last message'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
-        $this->MaintainVariable('LastCycle', $this->Translate('Last cycle'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, true);
+        $this->MaintainVariable('LastMessage', $this->Translate('Timestamp of last message'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, $with_tstamp_vars);
+        $this->MaintainVariable('LastCycle', $this->Translate('Last cycle'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, $with_tstamp_vars);
 
         $syslog_server = $this->ReadPropertyString('server');
         $syslog_port = $this->ReadPropertyInteger('port');
@@ -84,13 +96,13 @@ class Syslog extends IPSModule
             $ok = true;
             if ($default_severity != '') {
                 if ($this->decode_severity($default_severity) == -1) {
-                    echo "unsupported value \"$default_severity\" for property \"severity\"";
+                    echo 'unsupported value "' . $default_severity . '" for property "' . severity . '"';
                     $ok = false;
                 }
             }
             if ($default_facility != '') {
                 if ($this->decode_facility($default_facility) == -1) {
-                    echo "unsupported value \"$default_facility\" for property \"facility\"";
+                    echo 'unsupported value "' . $default_facility . '" for property "' . facility . '"';
                     $ok = false;
                 }
             }
@@ -121,14 +133,33 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'Label', 'label' => 'transfer IPS-messages to syslog'];
         $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
         $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
-        $formElements[] = ['type' => 'Label', 'label' => 'with message-type ...'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_ERROR', 'caption' => ' ... ERROR'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_WARNING', 'caption' => ' ... WARNING'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_SUCCESS', 'caption' => ' ... SUCCESS'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_MESSAGE', 'caption' => ' ... MESSAGE'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_NOTIFY', 'caption' => ' ... NOTIFY'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_CUSTOM', 'caption' => ' ... CUSTOM'];
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_KL_DEBUG', 'caption' => ' ... DEBUG'];
+
+		$columns = [];
+		$columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => 'auto'];
+		$columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
+								'type' => 'CheckBox', 'caption' => 'Message is active'
+							]
+						];
+		$columns[] = ['caption' => 'Type', 'name' => 'msgtype', 'width' => 'auto', 'save' => true, 'visible' => false];
+    	$formElements[] = ['type' => 'List', 'name' => 'msgtypes', 'caption' => 'Messages', 'rowCount' => 7, 'add' => false, 'delete' => false, 'columns' => $columns];
+
+		$options = [
+				['caption' => 'Sender', 'value' => 'Sender'],
+				['caption' => 'Text', 'value' => 'Text'],
+			];
+
+		$columns = [];
+		$columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => '', 'width' => '100', 'edit' => [
+								'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
+							]
+						];
+		$columns[] = ['caption' => 'Regular expression for named field', 'name' => 'expression', 'add' => '', 'width' => 'auto', 'edit' => [
+								'type' => 'ValidationTextBox'
+							]
+						];
+    	$formElements[] = ['type' => 'List', 'name' => 'exclude_filters', 'caption' => 'Exclude filter', 'rowCount' => 5, 'add' => true, 'delete' => true, 'columns' => $columns];
+
+        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_tstamp_vars', 'caption' => 'Variables for Timestamps'];
 
         $formActions = [];
         $formActions[] = ['type' => 'Button', 'label' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
@@ -148,7 +179,8 @@ class Syslog extends IPSModule
         $formStatus[] = ['code' => IS_NOTCREATED, 'icon' => 'inactive', 'caption' => 'Instance is not created'];
 
         $formStatus[] = ['code' => IS_INVALIDCONFIG, 'icon' => 'error', 'caption' => 'Instance is inactive (invalid configuration)'];
-        $formStatus[] = ['code' => IS_BUFFEROVERRUN, 'icon' => 'error', 'caption' => 'Instance is inactive (buffer overrun)'];
+        $formStatus[] = ['code' => IS_NOSNAPSHOT, 'icon' => 'error', 'caption' => 'Instance is inactive (no snapshot)'];
+        $formStatus[] = ['code' => IS_BADDATA, 'icon' => 'error', 'caption' => 'Instance is inactive (bad data)'];
 
         return json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
     }
@@ -178,13 +210,32 @@ class Syslog extends IPSModule
 
     public function CheckMessages()
     {
-        $with_KL_MESSAGE = $this->ReadPropertyBoolean('with_KL_MESSAGE');
-        $with_KL_SUCCESS = $this->ReadPropertyBoolean('with_KL_SUCCESS');
-        $with_KL_NOTIFY = $this->ReadPropertyBoolean('with_KL_NOTIFY');
-        $with_KL_WARNING = $this->ReadPropertyBoolean('with_KL_WARNING');
-        $with_KL_ERROR = $this->ReadPropertyBoolean('with_KL_ERROR');
-        $with_KL_DEBUG = $this->ReadPropertyBoolean('with_KL_DEBUG');
-        $with_KL_CUSTOM = $this->ReadPropertyBoolean('with_KL_CUSTOM');
+		$type2severity = [
+				KL_ERROR   => 'error',
+				KL_WARNING => 'warning',
+				KL_MESSAGE => 'info',
+				KL_CUSTOM  => 'info',
+				KL_SUCCESS => 'notice',
+				KL_NOTIFY  => 'notice',
+				KL_DEBUG   => 'debug',
+			];
+
+		$active_types = [];
+        $s = $this->ReadPropertyString('msgtypes');
+		$msgtypes = json_decode($s, true);
+		$this->SendDebug(__FUNCTION__, 'msgtypes=' . print_r($msgtypes, true), 0);
+		if ($msgtypes != '') {
+			foreach ($msgtypes as $msgtype) {
+				if ($msgtype['active']) {
+					$active_types[] = $msgtype['msgtype'];
+				}
+			}
+		}
+		$this->SendDebug(__FUNCTION__, 'active_types=' . print_r($active_types, true), 0);
+
+        $s = $this->ReadPropertyString('exclude_filters');
+		$exclude_filters = json_decode($s, true);
+		$this->SendDebug(__FUNCTION__, 'exclude_filters=' . print_r($exclude_filters, true), 0);
 
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
@@ -194,14 +245,19 @@ class Syslog extends IPSModule
 
         $this->SendDebug(__FUNCTION__, 'start cycle with TimeStamp=' . $TimeStamp, 0);
 
-        @$r = IPS_GetSnapshotChanges($TimeStamp);
+        $r = @IPS_GetSnapshotChanges($TimeStamp);
         if ($r == '') {
-            $this->SetStatus(IS_BUFFEROVERRUN);
+            $this->SetStatus(IS_NOSNAPSHOT);
             return;
         }
         $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
         $snapshot = json_decode($r, true);
-        $this->SendDebug(__FUNCTION__, 'size of array=' . count($snapshot), 0);
+		if ($snapshot == '') {
+			$this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', data=' . substr($r, 0, 1024) . '...', 0);
+			$this->SetStatus(IS_BADDATA);
+			return;
+		}
+        $this->SendDebug(__FUNCTION__, 'message-count=' . count($snapshot), 0);
 
         $last_tstamp = 0;
         foreach ($snapshot as $obj) {
@@ -234,7 +290,37 @@ class Syslog extends IPSModule
                     break;
             }
 
+            if ($sender != '' && $exclude_filters != '') {
+				foreach ($exclude_filters as $filter) {
+					if ($filter['field'] != "Sender")
+						continue;;
+					$expr = $filter['expression'];
+					if (preg_match('/^[^\/].*[^\/]$/', $expr))
+						$expr = '/' . $expr . '/';
+					if (preg_match($expr, $sender)) {
+						$this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', sender=' . $sender . ' => suppress', 0);
+						$sender = '';
+					}
+				}
+			}
             if ($sender == '') {
+                continue;
+            }
+
+            if ($text != '' && $exclude_filters != '') {
+				foreach ($exclude_filters as $filter) {
+					if ($filter['field'] != "Text")
+						continue;;
+					$expr = $filter['expression'];
+					if (preg_match('/^[^\/].*[^\/]$/', $expr))
+						$expr = '/' . $expr . '/';
+					if (preg_match($expr, $text)) {
+						$this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', text=' . $text . ' => suppress', 0);
+						$text = '';
+					}
+				}
+			}
+            if ($text == '') {
                 continue;
             }
 
@@ -245,46 +331,11 @@ class Syslog extends IPSModule
             $txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
             $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
 
-            $severity = '';
-            switch ($Message) {
-                case KL_ERROR:
-                    if ($with_KL_ERROR) {
-                        $severity = 'error';
-                    }
-                    break;
-                case KL_WARNING:
-                    if ($with_KL_WARNING) {
-                        $severity = 'warning';
-                    }
-                    break;
-                case KL_MESSAGE:
-                    if ($with_KL_MESSAGE) {
-                        $severity = 'info';
-                    }
-                    break;
-                case KL_CUSTOM:
-                    if ($with_KL_CUSTOM) {
-                        $severity = 'info';
-                    }
-                    break;
-                case KL_SUCCESS:
-                    if ($with_KL_SUCCESS) {
-                        $severity = 'notice';
-                    }
-                case KL_NOTIFY:
-                    if ($with_KL_NOTIFY) {
-                        $severity = 'notice';
-                    }
-                    break;
-                case KL_DEBUG:
-                    if ($with_KL_DEBUG) {
-                        $severity = 'debug';
-                    }
-                    break;
-                default:
-                    $severity = '';
-                    break;
-            }
+			if (in_array($Message, $active_types) && isset($type2severity[$Message])) {
+				$severity = $type2severity[$Message];
+			} else {
+				$severity = '';
+			}
             if ($severity != '') {
                 $this->Message($txt, $severity);
             }
@@ -292,8 +343,11 @@ class Syslog extends IPSModule
 
         $this->SetBuffer('TimeStamp', $TimeStamp);
 
-        $this->SetValue('LastMessage', $last_tstamp);
-        $this->SetValue('LastCycle', time());
+        $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
+		if ($with_tstamp_vars) {
+			$this->SetValue('LastMessage', $last_tstamp);
+			$this->SetValue('LastCycle', time());
+		}
     }
 
     public function TestMessage()
@@ -314,8 +368,7 @@ class Syslog extends IPSModule
         }
         $_severity = $this->decode_severity($severity);
         if ($_severity == -1) {
-            echo "unsupported severity \"$default_severity\"";
-
+            echo 'unsupported severity "' . $default_severity . '"';
             return -1;
         }
         if ($facility == null || $facility == '') {
@@ -323,7 +376,7 @@ class Syslog extends IPSModule
         }
         $_facility = $this->decode_facility($facility);
         if ($_facility == -1) {
-            echo "unsupported facility \"$default_facility\"";
+            echo 'unsupported facility "' . $default_facility . '"';
 
             return -1;
         }
@@ -355,19 +408,17 @@ class Syslog extends IPSModule
             . ' '
             . $msg;
 
-        $this->SendDebug(__FUNCTION__, "server=$server:$port, message=\"$syslog_message\"", 0);
+        $this->SendDebug(__FUNCTION__, 'server=' . $server . ', port=' . $port . ', message="' . $syslog_message . '"', 0);
 
         $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         if (!$sock) {
-            echo "unable to create socket(server:$server, port=$port)\n";
-
+            echo 'unable to create socket(' . $server . ':' . $port . ')';
             return -1;
         }
         $l = strlen($syslog_message);
         $n = socket_sendto($sock, $syslog_message, $l, 0, $server, (int) $port);
         if ($n != $l) {
-            echo "unable to set messages \"$syslog_message\" to socket(server:$server, port=$port)\n";
-
+            echo 'unable to set messages "' . $syslog_message . '" to socket(' . $server . ':' . $port . ')';
             return -1;
         }
         socket_close($sock);

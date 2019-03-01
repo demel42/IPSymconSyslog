@@ -135,7 +135,7 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
 
         $columns = [];
-        $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => 'auto'];
+        $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => '150px'];
         $columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
                                 'type' => 'CheckBox', 'caption' => 'Message is active'
                             ]
@@ -149,7 +149,7 @@ class Syslog extends IPSModule
             ];
 
         $columns = [];
-        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => 'Sender', 'width' => '100', 'edit' => [
+        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => 'Sender', 'width' => '150px', 'edit' => [
                                 'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
                             ]
                         ];

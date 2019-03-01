@@ -54,19 +54,19 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyInteger('update_interval', '0');
 
-		$msgtypes = [
-				['msgtype' => KL_MESSAGE, 'title' => 'MESSAGE', 'active' => true],
-				['msgtype' => KL_SUCCESS, 'title' => 'SUCCESS', 'active' => true],
-				['msgtype' => KL_NOTIFY, 'title' => 'NOTIFY', 'active' => true],
-				['msgtype' => KL_WARNING, 'title' => 'WARNING', 'active' => true],
-				['msgtype' => KL_ERROR, 'title' => 'ERROR', 'active' => true],
-				['msgtype' => KL_DEBUG, 'title' => 'DEBUG', 'active' => false],
-				['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
-			];
+        $msgtypes = [
+                ['msgtype' => KL_MESSAGE, 'title' => 'MESSAGE', 'active' => true],
+                ['msgtype' => KL_SUCCESS, 'title' => 'SUCCESS', 'active' => true],
+                ['msgtype' => KL_NOTIFY, 'title' => 'NOTIFY', 'active' => true],
+                ['msgtype' => KL_WARNING, 'title' => 'WARNING', 'active' => true],
+                ['msgtype' => KL_ERROR, 'title' => 'ERROR', 'active' => true],
+                ['msgtype' => KL_DEBUG, 'title' => 'DEBUG', 'active' => false],
+                ['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
+            ];
         $this->RegisterPropertyString('msgtypes', json_encode($msgtypes));
-		$exclude_filters = [
-				['field' => 'Sender', 'expression' => 'VariableManager'],
-			];
+        $exclude_filters = [
+                ['field' => 'Sender', 'expression' => 'VariableManager'],
+            ];
         $this->RegisterPropertyString('exclude_filters', json_encode($exclude_filters));
 
         $this->RegisterPropertyBoolean('with_tstamp_vars', false);
@@ -134,30 +134,30 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
         $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
 
-		$columns = [];
-		$columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => 'auto'];
-		$columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
-								'type' => 'CheckBox', 'caption' => 'Message is active'
-							]
-						];
-		$columns[] = ['caption' => 'Type', 'name' => 'msgtype', 'width' => 'auto', 'save' => true, 'visible' => false];
-    	$formElements[] = ['type' => 'List', 'name' => 'msgtypes', 'caption' => 'Messages', 'rowCount' => 7, 'add' => false, 'delete' => false, 'columns' => $columns];
+        $columns = [];
+        $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => 'auto'];
+        $columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
+                                'type' => 'CheckBox', 'caption' => 'Message is active'
+                            ]
+                        ];
+        $columns[] = ['caption' => 'Type', 'name' => 'msgtype', 'width' => 'auto', 'save' => true, 'visible' => false];
+        $formElements[] = ['type' => 'List', 'name' => 'msgtypes', 'caption' => 'Messages', 'rowCount' => 7, 'add' => false, 'delete' => false, 'columns' => $columns];
 
-		$options = [
-				['caption' => 'Sender', 'value' => 'Sender'],
-				['caption' => 'Text', 'value' => 'Text'],
-			];
+        $options = [
+                ['caption' => 'Sender', 'value' => 'Sender'],
+                ['caption' => 'Text', 'value' => 'Text'],
+            ];
 
-		$columns = [];
-		$columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => '', 'width' => '100', 'edit' => [
-								'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
-							]
-						];
-		$columns[] = ['caption' => 'Regular expression for named field', 'name' => 'expression', 'add' => '', 'width' => 'auto', 'edit' => [
-								'type' => 'ValidationTextBox'
-							]
-						];
-    	$formElements[] = ['type' => 'List', 'name' => 'exclude_filters', 'caption' => 'Exclude filter', 'rowCount' => 5, 'add' => true, 'delete' => true, 'columns' => $columns];
+        $columns = [];
+        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => '', 'width' => '100', 'edit' => [
+                                'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
+                            ]
+                        ];
+        $columns[] = ['caption' => 'Regular expression for named field', 'name' => 'expression', 'add' => '', 'width' => 'auto', 'edit' => [
+                                'type' => 'ValidationTextBox'
+                            ]
+                        ];
+        $formElements[] = ['type' => 'List', 'name' => 'exclude_filters', 'caption' => 'Exclude filter', 'rowCount' => 5, 'add' => true, 'delete' => true, 'columns' => $columns];
 
         $formElements[] = ['type' => 'CheckBox', 'name' => 'with_tstamp_vars', 'caption' => 'Variables for Timestamps'];
 
@@ -210,32 +210,32 @@ class Syslog extends IPSModule
 
     public function CheckMessages()
     {
-		$type2severity = [
-				KL_ERROR   => 'error',
-				KL_WARNING => 'warning',
-				KL_MESSAGE => 'info',
-				KL_CUSTOM  => 'info',
-				KL_SUCCESS => 'notice',
-				KL_NOTIFY  => 'notice',
-				KL_DEBUG   => 'debug',
-			];
+        $type2severity = [
+                KL_ERROR   => 'error',
+                KL_WARNING => 'warning',
+                KL_MESSAGE => 'info',
+                KL_CUSTOM  => 'info',
+                KL_SUCCESS => 'notice',
+                KL_NOTIFY  => 'notice',
+                KL_DEBUG   => 'debug',
+            ];
 
-		$active_types = [];
+        $active_types = [];
         $s = $this->ReadPropertyString('msgtypes');
-		$msgtypes = json_decode($s, true);
-		$this->SendDebug(__FUNCTION__, 'msgtypes=' . print_r($msgtypes, true), 0);
-		if ($msgtypes != '') {
-			foreach ($msgtypes as $msgtype) {
-				if ($msgtype['active']) {
-					$active_types[] = $msgtype['msgtype'];
-				}
-			}
-		}
-		$this->SendDebug(__FUNCTION__, 'active_types=' . print_r($active_types, true), 0);
+        $msgtypes = json_decode($s, true);
+        $this->SendDebug(__FUNCTION__, 'msgtypes=' . print_r($msgtypes, true), 0);
+        if ($msgtypes != '') {
+            foreach ($msgtypes as $msgtype) {
+                if ($msgtype['active']) {
+                    $active_types[] = $msgtype['msgtype'];
+                }
+            }
+        }
+        $this->SendDebug(__FUNCTION__, 'active_types=' . print_r($active_types, true), 0);
 
         $s = $this->ReadPropertyString('exclude_filters');
-		$exclude_filters = json_decode($s, true);
-		$this->SendDebug(__FUNCTION__, 'exclude_filters=' . print_r($exclude_filters, true), 0);
+        $exclude_filters = json_decode($s, true);
+        $this->SendDebug(__FUNCTION__, 'exclude_filters=' . print_r($exclude_filters, true), 0);
 
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
@@ -252,11 +252,11 @@ class Syslog extends IPSModule
         }
         $this->SendDebug(__FUNCTION__, 'length of data=' . strlen($r), 0);
         $snapshot = json_decode($r, true);
-		if ($snapshot == '') {
-			$this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', data=' . substr($r, 0, 1024) . '...', 0);
-			$this->SetStatus(IS_BADDATA);
-			return;
-		}
+        if ($snapshot == '') {
+            $this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', data=' . substr($r, 0, 1024) . '...', 0);
+            $this->SetStatus(IS_BADDATA);
+            return;
+        }
         $this->SendDebug(__FUNCTION__, 'message-count=' . count($snapshot), 0);
 
         $last_tstamp = 0;
@@ -291,35 +291,39 @@ class Syslog extends IPSModule
             }
 
             if ($sender != '' && $exclude_filters != '') {
-				foreach ($exclude_filters as $filter) {
-					if ($filter['field'] != "Sender")
-						continue;;
-					$expr = $filter['expression'];
-					if (preg_match('/^[^\/].*[^\/]$/', $expr))
-						$expr = '/' . $expr . '/';
-					if (preg_match($expr, $sender)) {
-						$this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', sender=' . $sender . ' => suppress', 0);
-						$sender = '';
-					}
-				}
-			}
+                foreach ($exclude_filters as $filter) {
+                    if ($filter['field'] != 'Sender') {
+                        continue;
+                    }
+                    $expr = $filter['expression'];
+                    if (preg_match('/^[^\/].*[^\/]$/', $expr)) {
+                        $expr = '/' . $expr . '/';
+                    }
+                    if (preg_match($expr, $sender)) {
+                        $this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', sender=' . $sender . ' => suppress', 0);
+                        $sender = '';
+                    }
+                }
+            }
             if ($sender == '') {
                 continue;
             }
 
             if ($text != '' && $exclude_filters != '') {
-				foreach ($exclude_filters as $filter) {
-					if ($filter['field'] != "Text")
-						continue;;
-					$expr = $filter['expression'];
-					if (preg_match('/^[^\/].*[^\/]$/', $expr))
-						$expr = '/' . $expr . '/';
-					if (preg_match($expr, $text)) {
-						$this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', text=' . $text . ' => suppress', 0);
-						$text = '';
-					}
-				}
-			}
+                foreach ($exclude_filters as $filter) {
+                    if ($filter['field'] != 'Text') {
+                        continue;
+                    }
+                    $expr = $filter['expression'];
+                    if (preg_match('/^[^\/].*[^\/]$/', $expr)) {
+                        $expr = '/' . $expr . '/';
+                    }
+                    if (preg_match($expr, $text)) {
+                        $this->SendDebug(__FUNCTION__, 'expr=' . $expr . ', text=' . $text . ' => suppress', 0);
+                        $text = '';
+                    }
+                }
+            }
             if ($text == '') {
                 continue;
             }
@@ -331,11 +335,11 @@ class Syslog extends IPSModule
             $txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
             $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
 
-			if (in_array($Message, $active_types) && isset($type2severity[$Message])) {
-				$severity = $type2severity[$Message];
-			} else {
-				$severity = '';
-			}
+            if (in_array($Message, $active_types) && isset($type2severity[$Message])) {
+                $severity = $type2severity[$Message];
+            } else {
+                $severity = '';
+            }
             if ($severity != '') {
                 $this->Message($txt, $severity);
             }
@@ -344,10 +348,10 @@ class Syslog extends IPSModule
         $this->SetBuffer('TimeStamp', $TimeStamp);
 
         $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
-		if ($with_tstamp_vars) {
-			$this->SetValue('LastMessage', $last_tstamp);
-			$this->SetValue('LastCycle', time());
-		}
+        if ($with_tstamp_vars) {
+            $this->SetValue('LastMessage', $last_tstamp);
+            $this->SetValue('LastCycle', time());
+        }
     }
 
     public function TestMessage()

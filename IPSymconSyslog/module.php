@@ -210,15 +210,15 @@ class Syslog extends IPSModule
 
     public function CheckMessages()
     {
-		$type2severity = [
-				KL_ERROR   => 'error',
-				KL_WARNING => 'warning',
-				KL_MESSAGE => 'info',
-				KL_CUSTOM  => 'info',
-				KL_SUCCESS => 'notice',
-				KL_NOTIFY  => 'notice',
-				KL_DEBUG   => 'debug',
-			];
+        $type2severity = [
+                KL_ERROR   => 'error',
+                KL_WARNING => 'warning',
+                KL_MESSAGE => 'info',
+                KL_CUSTOM  => 'info',
+                KL_SUCCESS => 'notice',
+                KL_NOTIFY  => 'notice',
+                KL_DEBUG   => 'debug',
+            ];
 
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
@@ -242,19 +242,19 @@ class Syslog extends IPSModule
         }
         $this->SendDebug(__FUNCTION__, 'message-count=' . count($snapshot), 0);
 
-		$active_types = [];
+        $active_types = [];
         $s = $this->ReadPropertyString('msgtypes');
-		$msgtypes = json_decode($s, true);
-		if ($msgtypes != '') {
-			foreach ($msgtypes as $msgtype) {
-				if ($msgtype['active']) {
-					$active_types[] = $msgtype['msgtype'];
-				}
-			}
-		}
+        $msgtypes = json_decode($s, true);
+        if ($msgtypes != '') {
+            foreach ($msgtypes as $msgtype) {
+                if ($msgtype['active']) {
+                    $active_types[] = $msgtype['msgtype'];
+                }
+            }
+        }
 
         $s = $this->ReadPropertyString('exclude_filters');
-		$exclude_filters = json_decode($s, true);
+        $exclude_filters = json_decode($s, true);
 
         $last_tstamp = 0;
         foreach ($snapshot as $obj) {

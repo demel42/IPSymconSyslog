@@ -149,7 +149,7 @@ class Syslog extends IPSModule
             ];
 
         $columns = [];
-        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => '', 'width' => '100', 'edit' => [
+        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => 'Sender', 'width' => '100', 'edit' => [
                                 'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
                             ]
                         ];

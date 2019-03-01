@@ -20,8 +20,8 @@
 
 			"Name": "Bezeichnung",
 			"Active": "aktiv",
-			"Messagetyp is active": "Nachrichtentyp ist aktiv",
-			"Active messages": "aktive Nachrichten",
+			"Message is active": "Nachricht ist aktiv",
+			"Messages": "aktive Nachrichten",
 
 			"Field": "Feld",
 			"Regular expression for named field": "Regulärer Ausdruck für das angegebene Feld",

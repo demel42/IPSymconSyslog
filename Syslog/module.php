@@ -235,17 +235,17 @@ class Syslog extends IPSModule
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
         if ($sdata == '') {
             $this->SetStatus(IS_NOSNAPSHOT);
-			$old_ts = $TimeStamp;
+            $old_ts = $TimeStamp;
             $this->InitialSnapshot();
-			$TimeStamp = $this->GetBuffer('TimeStamp');
+            $TimeStamp = $this->GetBuffer('TimeStamp');
             $this->SendDebug(__FUNCTION__, 'unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', 0);
             $this->LogMessage('unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', KL_NOTIFY);
-			$sdata = @IPS_GetSnapshotChanges($TimeStamp);
-			if ($sdata == '') {
-				$this->SendDebug(__FUNCTION__, 'unable to get snapshot (#' . $TimeStamp . '), reset failed', 0);
-				$this->LogMessage('unable to get snapshot (#' . $TimeStamp . ') , reset failed', KL_NOTIFY);
-				return;
-			}
+            $sdata = @IPS_GetSnapshotChanges($TimeStamp);
+            if ($sdata == '') {
+                $this->SendDebug(__FUNCTION__, 'unable to get snapshot (#' . $TimeStamp . '), reset failed', 0);
+                $this->LogMessage('unable to get snapshot (#' . $TimeStamp . ') , reset failed', KL_NOTIFY);
+                return;
+            }
         }
         $udata = utf8_encode($sdata);
         $snapshot = json_decode($udata, true);
@@ -272,7 +272,7 @@ class Syslog extends IPSModule
         $exclude_filters = json_decode($s, true);
 
         $last_tstamp = 0;
-		$n_accepted = 0;
+        $n_accepted = 0;
         foreach ($snapshot as $obj) {
             $SenderID = $obj['SenderID'];
             $TimeStamp = $obj['TimeStamp'];
@@ -357,7 +357,7 @@ class Syslog extends IPSModule
             }
             if ($severity != '') {
                 $this->Message($txt, $severity);
-				$n_accepted++;
+                $n_accepted++;
             }
         }
 

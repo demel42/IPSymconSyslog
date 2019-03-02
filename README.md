@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
-[![IPS-Version](https://img.shields.io/badge/Symcon_Version-4.4+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-1.1-blue.svg)
+[![IPS-Version](https://img.shields.io/badge/Symcon_Version-5.0+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+![Module-Version](https://img.shields.io/badge/Modul_Version-2.1-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![StyleCI](https://github.styleci.io/repos/126683101/shield?branch=master)](https://github.styleci.io/repos/126683101)
@@ -20,9 +20,15 @@
 
 ## 1. Funktionsumfang
 
+Das Modul umfasst zwei FUnktionsblöcke
+
+a) die Übertragung einzelner Nachrichten an den Syslog-Server. Dazu stehen einige FUnktionen zur Verfügung
+b) die automatische, zyklische Übertragung der IPS-Logmeldungen an der Syslog-Server
+
 ## 2. Voraussetzungen
 
- - IP-Symcon ab Version 4.4
+ - IP-Symcon ab Version 5.x
+   Version 4.4 mit Branch _ips_4.4_ (nur noch Fehlerkorrekturen)
  - Syslog-Server
    - Protokoll: IETF (RFC 5424)
    - Transportschicht: UDP
@@ -75,21 +81,48 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 
 ## 5. Konfiguration:
 
-### Variablen
+### globale Variablen
 
 | Eigenschaft               | Typ      | Standardwert | Beschreibung |
 | :-----------------------: | :-----:  | :----------: | :----------------------------------------------------------------------------------------------------------: |
 | Server                    | string   |              | Hostname / IP-Adresse des Syslog-Servers |
 | Port                      | integer  | 514          | Port, unter dem der Syslog-Server die Daten empfängt |
+
+### Variablen für das Senden von einzelnen Nachrichten
+
+| Eigenschaft               | Typ      | Standardwert | Beschreibung |
+| :-----------------------: | :-----:  | :----------: | :----------------------------------------------------------------------------------------------------------: |
 | Schwere                   | string   | info         | Schwere (severity) der Nachricht |
 | Kategorie                 | string   | info         | Kategorie (facility) der Nachricht |
 | Programm                  | string   | info         | Programm der Nachricht |
+
+### Variablen für die zyklische Übertragung von IPS-Logmeldungen
+
+| Eigenschaft               | Typ      | Standardwert                | Beschreibung |
+| :-----------------------: | :-----:  | :-------------------------: | :----------------------------------------------------------------------------------------------------------: |
+| Intervall                 | integer  | 10                          | Aktualisierungsintervall, Angabe in Sekunden |
+| aktive Nachrichten        | list     | alles ausser DEBUG auf true | Angabe der Nachrichten-Typen, die übertragen werden sollen |
+| Ausschlussfilter          | list     | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
+| Variablen für Zeitstempel | bool     | false                       | Variablen für einen Zeitstempel der letzten Prüfung und der letzten übertragenen Nachricht |
+| Ausschlussfilter          | list     | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
+
+Hinweis zu _Intervall_
+- das Intervall sollte nicht zu groß sein, damit alle Nachrichten zum vorigen Zyklus noch vorhanden sind. Zuständig hier für ist die Spezialschalter [MessageRingBufferSize](https://www.symcon.de/service/dokumentation/entwicklerbereich/spezialschalter), der muss ggfs erhöht werden. Wenn dieser Wert nicht ausreicht wird im IPS-Log eine Meldung mit dem Text _unable to get snapshot ..._ ausgegeben.
+
+Hinweis zu _Ausschluss-Filter_
+- der Ausdruck ist ein regulärer Ausdruck, bei fehlendem **/** (notwendig für einen regulären Ausdruck) an Anfang oder Ende wird dies ergänzt.
+- die Werte für _Sender_ finden sich in der 4. Spalte des IPS-Logs
+- die einzelnen Ausdrücke wirken unabhängig von einander (ODER-Verknüpfung)
+
+Hinweis zu _Variablen für Zeitstempel_
+- Wenn man die Änderung von Variablen nicht ausschliessst (_VariablenManager_), erzeugt man sich ein zusätzliches Nachrichten-Aufkommen, wenn die Variablen benutzt werden.
 
 ### Schaltflächen
 
 | Bezeichnung                  | Beschreibung |
 | :--------------------------: | :------------------------------------------------: |
 | Testnachricht                | Sendet eine Testnachricht |
+| Prüfe Nachrichten            | führt eine sofortige Prüfung durch |
 
 ## 6. Anhang
 
@@ -100,6 +133,10 @@ GUIDs
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
 
 ## 7. Versions-Historie
+
+- 2.1 @ 02.03.2019 09:24<br>
+  - Anpassungen IPS 5, Abspaltung Branch _ips_4.4_
+  - Protokollierung aller IPS-Protokoll-Messages ...
 
 - 1.1 @ 17.09.2018 17:47<br>
   - Versionshistorie dazu,

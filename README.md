@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
 [![IPS-Version](https://img.shields.io/badge/Symcon_Version-4.4+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-1.1-blue.svg)
+![Module-Version](https://img.shields.io/badge/Modul_Version-1.1.1-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![StyleCI](https://github.styleci.io/repos/126683101/shield?branch=master)](https://github.styleci.io/repos/126683101)
@@ -100,6 +100,9 @@ GUIDs
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
 
 ## 7. Versions-Historie
+
+- 1.1.1 @ 02.03.2019 09:24<br>
+  - Anpassungen IPS 5, Abspaltung Branch _ips_4.4_
 
 - 1.1 @ 17.09.2018 17:47<br>
   - Versionshistorie dazu,

@@ -27,7 +27,7 @@ b) die automatische, zyklische Übertragung der IPS-Logmeldungen an der Syslog-S
 
 ## 2. Voraussetzungen
 
- - IP-Symcon ab Version 5.x
+ - IP-Symcon ab Version 5.x<br>
    Version 4.4 mit Branch _ips_4.4_ (nur noch Fehlerkorrekturen)
  - Syslog-Server
    - Protokoll: IETF (RFC 5424)

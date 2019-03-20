@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
 [![IPS-Version](https://img.shields.io/badge/Symcon_Version-5.0+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-2.1-blue.svg)
+![Module-Version](https://img.shields.io/badge/Modul_Version-2.2-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![StyleCI](https://github.styleci.io/repos/126683101/shield?branch=master)](https://github.styleci.io/repos/126683101)
@@ -20,7 +20,7 @@
 
 ## 1. Funktionsumfang
 
-Das Modul umfasst zwei FUnktionsblöcke
+Das Modul umfasst zwei Funktionsblöcke
 
 a) die Übertragung einzelner Nachrichten an den Syslog-Server. Dazu stehen einige FUnktionen zur Verfügung
 b) die automatische, zyklische Übertragung der IPS-Logmeldungen an der Syslog-Server
@@ -133,6 +133,9 @@ GUIDs
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
 
 ## 7. Versions-Historie
+
+- 2.2 @ 20.03.2019 20:27<br>
+  - Konfigurations-Element IntervalBox -> NumberSpinner
 
 - 2.1 @ 02.03.2019 09:24<br>
   - Anpassungen IPS 5, Abspaltung Branch _ips_4.4_

@@ -136,7 +136,7 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'Label', 'label' => ''];
         $formElements[] = ['type' => 'Label', 'label' => 'transfer IPS-messages to syslog'];
         $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
-        $formElements[] = ['type' => 'IntervalBox', 'name' => 'update_interval', 'caption' => 'Seconds'];
+        $formElements[] = ['type' => 'NumberSpinner', 'name' => 'update_interval', 'caption' => 'Seconds'];
 
         $columns = [];
         $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => '150px'];

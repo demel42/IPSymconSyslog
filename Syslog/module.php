@@ -2,42 +2,6 @@
 
 require_once __DIR__ . '/../libs/common.php';  // globale Funktionen
 
-if (!defined('KL_MESSAGE')) {
-    define('IPS_BASE', 10000);
-    // --- KERNEL LOGMESSAGE
-    define('IPS_LOGMESSAGE', IPS_BASE + 200);           // Logmessage Message
-    define('KL_MESSAGE', IPS_LOGMESSAGE + 1);           // Normal Message
-    define('KL_SUCCESS', IPS_LOGMESSAGE + 2);           // Success Message
-    define('KL_NOTIFY', IPS_LOGMESSAGE + 3);            // Notiy about Changes
-    define('KL_WARNING', IPS_LOGMESSAGE + 4);           // Warnings
-    define('KL_ERROR', IPS_LOGMESSAGE + 5);             // Error Message
-    define('KL_DEBUG', IPS_LOGMESSAGE + 6);             // Debug Informations + Script Results
-    define('KL_CUSTOM', IPS_LOGMESSAGE + 7);            // User Message
-}
-
-if (!defined('IS_SBASE')) {
-    define('IS_SBASE', 100);							// Wertebasis für Status Codes
-    define('IS_CREATING', IS_SBASE + 1);				// Instanz wurde erstellt
-    define('IS_ACTIVE', IS_SBASE + 2);					// Instanz wurde erstellt und ist aktiv
-    define('IS_DELETING', IS_SBASE + 3);				// Instanz wurde gelöscht
-    define('IS_INACTIVE', IS_SBASE + 4);				// Instanz wird nicht benutzt
-    define('IS_NOTCREATED', IS_SBASE + 5);				// Instanz wurde nicht erstellt
-    define('IS_EBASE', 200);							// Base Message
-}
-
-if (!defined('IS_INVALIDCONFIG')) {
-    define('IS_INVALIDCONFIG', IS_EBASE + 1);
-    define('IS_NOSNAPSHOT', IS_EBASE + 2);
-    define('IS_BADDATA', IS_EBASE + 3);
-}
-
-if (!defined('VARIABLETYPE_BOOLEAN')) {
-    define('VARIABLETYPE_BOOLEAN', 0);
-    define('VARIABLETYPE_INTEGER', 1);
-    define('VARIABLETYPE_FLOAT', 2);
-    define('VARIABLETYPE_STRING', 3);
-}
-
 class Syslog extends IPSModule
 {
     use SyslogCommon;

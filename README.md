@@ -136,6 +136,7 @@ GUIDs
 
 - 2.2 @ 20.03.2019 20:27<br>
   - Konfigurations-Element IntervalBox -> NumberSpinner
+  - Anpassungen IPS 5
 
 - 2.1 @ 02.03.2019 09:24<br>
   - Anpassungen IPS 5, Abspaltung Branch _ips_4.4_

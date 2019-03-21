@@ -1,39 +1,17 @@
 <?php
 
-if (!defined('KL_MESSAGE')) {
-    define('IPS_BASE', 10000);
-    // --- KERNEL LOGMESSAGE
-    define('IPS_LOGMESSAGE', IPS_BASE + 200);           // Logmessage Message
-    define('KL_MESSAGE', IPS_LOGMESSAGE + 1);           // Normal Message
-    define('KL_SUCCESS', IPS_LOGMESSAGE + 2);           // Success Message
-    define('KL_NOTIFY', IPS_LOGMESSAGE + 3);            // Notiy about Changes
-    define('KL_WARNING', IPS_LOGMESSAGE + 4);           // Warnings
-    define('KL_ERROR', IPS_LOGMESSAGE + 5);             // Error Message
-    define('KL_DEBUG', IPS_LOGMESSAGE + 6);             // Debug Informations + Script Results
-    define('KL_CUSTOM', IPS_LOGMESSAGE + 7);            // User Message
-}
-
-if (!defined('IS_SBASE')) {
-    define('IS_SBASE', 100);							// Wertebasis für Status Codes
-    define('IS_CREATING', IS_SBASE + 1);				// Instanz wurde erstellt
-    define('IS_ACTIVE', IS_SBASE + 2);					// Instanz wurde erstellt und ist aktiv
-    define('IS_DELETING', IS_SBASE + 3);				// Instanz wurde gelöscht
-    define('IS_INACTIVE', IS_SBASE + 4);				// Instanz wird nicht benutzt
-    define('IS_NOTCREATED', IS_SBASE + 5);				// Instanz wurde nicht erstellt
-    define('IS_EBASE', 200);							// Base Message
-}
-
-if (!defined('IS_INVALIDCONFIG')) {
-    define('IS_INVALIDCONFIG', IS_EBASE + 1);
-    define('IS_NOSNAPSHOT', IS_EBASE + 2);
-    define('IS_BADDATA', IS_EBASE + 3);
-}
 
 if (!defined('VARIABLETYPE_BOOLEAN')) {
     define('VARIABLETYPE_BOOLEAN', 0);
     define('VARIABLETYPE_INTEGER', 1);
     define('VARIABLETYPE_FLOAT', 2);
     define('VARIABLETYPE_STRING', 3);
+}
+
+if (!defined('IS_INVALIDCONFIG')) {
+    define('IS_INVALIDCONFIG', IS_EBASE + 1);
+    define('IS_NOSNAPSHOT', IS_EBASE + 2);
+    define('IS_BADDATA', IS_EBASE + 3);
 }
 
 trait SyslogCommon
@@ -46,11 +24,7 @@ trait SyslogCommon
             return;
         }
 
-        if (IPS_GetKernelVersion() >= 5) {
-            $ret = parent::SetValue($Ident, $Value);
-        } else {
-            $ret = SetValue($varID, $Value);
-        }
+		$ret = parent::SetValue($Ident, $Value);
         if ($ret == false) {
             $this->SendDebug(__FUNCTION__, 'mismatch of value "' . $Value . '" for variable ' . $Ident, 0);
         }
@@ -64,12 +38,7 @@ trait SyslogCommon
             return false;
         }
 
-        if (IPS_GetKernelVersion() >= 5) {
-            $ret = parent::GetValue($Ident);
-        } else {
-            $ret = GetValue($varID);
-        }
-
+		$ret = parent::GetValue($Ident);
         return $ret;
     }
 
@@ -133,40 +102,6 @@ trait SyslogCommon
             }
         }
         return 'text/plain';
-    }
-
-    protected function LogMessage($Message, $Severity)
-    {
-        if (IPS_GetKernelVersion() >= 5) {
-            switch ($Severity) {
-                case KL_NOTIFY:
-                case KL_WARNING:
-                case KL_ERROR:
-                case KL_DEBUG:
-                    parent::LogMessage($Message, $Severity);
-                    break;
-                default:
-                    echo __CLASS__ . '::' . __FUNCTION__ . ': unknown severity ' . $Severity;
-                    break;
-            }
-        } else {
-            switch ($Severity) {
-                case KL_NOTIFY:
-                    IPS_LogMessage(__CLASS__ . '::' . __FUNCTION__, 'INFO: ' . $Message);
-                    break;
-                case KL_WARNING:
-                    IPS_LogMessage(__CLASS__ . '::' . __FUNCTION__, 'WARNUNG: ' . $Message);
-                    break;
-                case KL_ERROR:
-                    echo $Message;
-                    break;
-                case KL_DEBUG:
-                    break;
-                default:
-                    echo __CLASS__ . '::' . __FUNCTION__ . ': unknown severity ' . $Severity;
-                    break;
-            }
-        }
     }
 
     private function GetArrayElem($data, $var, $dflt)

@@ -83,28 +83,28 @@ Sendet die Nachricht _Message_ an der Syslog-Server mit der severity _info_; als
 
 ### globale Variablen
 
-| Eigenschaft               | Typ      | Standardwert | Beschreibung |
-| :-----------------------: | :-----:  | :----------: | :----------------------------------------------------------------------------------------------------------: |
-| Server                    | string   |              | Hostname / IP-Adresse des Syslog-Servers |
-| Port                      | integer  | 514          | Port, unter dem der Syslog-Server die Daten empfängt |
+| Eigenschaft | Typ     | Standardwert | Beschreibung |
+| :---------- | :------ | :----------- | :----------- |
+| Server      | string  |              | Hostname / IP-Adresse des Syslog-Servers |
+| Port        | integer | 514          | Port, unter dem der Syslog-Server die Daten empfängt |
 
 ### Variablen für das Senden von einzelnen Nachrichten
 
-| Eigenschaft               | Typ      | Standardwert | Beschreibung |
-| :-----------------------: | :-----:  | :----------: | :----------------------------------------------------------------------------------------------------------: |
-| Schwere                   | string   | info         | Schwere (severity) der Nachricht |
-| Kategorie                 | string   | info         | Kategorie (facility) der Nachricht |
-| Programm                  | string   | info         | Programm der Nachricht |
+| Eigenschaft | Typ     | Standardwert | Beschreibung |
+| :---------- | :------ | :----------- | :----------- |
+| Schwere     | string  | info         | Schwere (severity) der Nachricht |
+| Kategorie   | string  | info         | Kategorie (facility) der Nachricht |
+| Programm    | string  | info         | Programm der Nachricht |
 
 ### Variablen für die zyklische Übertragung von IPS-Logmeldungen
 
-| Eigenschaft               | Typ      | Standardwert                | Beschreibung |
-| :-----------------------: | :-----:  | :-------------------------: | :----------------------------------------------------------------------------------------------------------: |
-| Intervall                 | integer  | 10                          | Aktualisierungsintervall, Angabe in Sekunden |
-| aktive Nachrichten        | list     | alles ausser DEBUG auf true | Angabe der Nachrichten-Typen, die übertragen werden sollen |
-| Ausschlussfilter          | list     | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
-| Variablen für Zeitstempel | bool     | false                       | Variablen für einen Zeitstempel der letzten Prüfung und der letzten übertragenen Nachricht |
-| Ausschlussfilter          | list     | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
+| Eigenschaft               | Typ     | Standardwert                | Beschreibung |
+| :------------------------ | :------ | :-------------------------- | :----------- |
+| Intervall                 | integer | 10                          | Aktualisierungsintervall, Angabe in Sekunden |
+| aktive Nachrichten        | list    | alles ausser DEBUG auf true | Angabe der Nachrichten-Typen, die übertragen werden sollen |
+| Ausschlussfilter          | list    | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
+| Variablen für Zeitstempel | bool    | false                       | Variablen für einen Zeitstempel der letzten Prüfung und der letzten übertragenen Nachricht |
+| Ausschlussfilter          | list    | VariablenManager            | Angabe von regulären Ausdrücken zur Unterdrückung von Nachrichten nach _Sender_ und _Text_ |
 
 Hinweis zu _Intervall_
 - das Intervall sollte nicht zu groß sein, damit alle Nachrichten zum vorigen Zyklus noch vorhanden sind. Zuständig hier für ist die Spezialschalter [MessageRingBufferSize](https://www.symcon.de/service/dokumentation/entwicklerbereich/spezialschalter), der muss ggfs erhöht werden. Wenn dieser Wert nicht ausreicht wird im IPS-Log eine Meldung mit dem Text _unable to get snapshot ..._ ausgegeben.
@@ -119,10 +119,10 @@ Hinweis zu _Variablen für Zeitstempel_
 
 ### Schaltflächen
 
-| Bezeichnung                  | Beschreibung |
-| :--------------------------: | :------------------------------------------------: |
-| Testnachricht                | Sendet eine Testnachricht |
-| Prüfe Nachrichten            | führt eine sofortige Prüfung durch |
+| Bezeichnung       | Beschreibung |
+| :---------------- | :----------- |
+| Testnachricht     | Sendet eine Testnachricht |
+| Prüfe Nachrichten | führt eine sofortige Prüfung durch |
 
 ## 6. Anhang
 

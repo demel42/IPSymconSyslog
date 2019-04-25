@@ -22,7 +22,7 @@
 
 Das Modul umfasst zwei Funktionsblöcke
 
-a) die Übertragung einzelner Nachrichten an den Syslog-Server. Dazu stehen einige FUnktionen zur Verfügung.<br>
+a) die Übertragung einzelner Nachrichten an den Syslog-Server. Dazu stehen einige Funktionen zur Verfügung.<br>
 b) die automatische, zyklische Übertragung der IPS-Logmeldungen an der Syslog-Server
 
 ## 2. Voraussetzungen

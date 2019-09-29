@@ -1,12 +1,12 @@
 {
 	"id": "{4FF4E908-F7EC-40A4-9114-A93AA5E29FAF}",
 	"author": "Ch. Damsky",
-	"name": "IPSymconSyslog",
+	"name": "Syslog-Client",
 	"url": "https://github.com/demel42/IPSymconSyslog",
 	"compatibility": {
 		"version": "5.0"
 	},
-	"version": "2.5",
+	"version": "2.6",
 	"build": 0,
-	"date": 1565353933
+	"date": 1569752421
 }

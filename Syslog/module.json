@@ -9,5 +9,6 @@
 	"parentRequirements": [],
 	"childRequirements": [],
 	"implemented": [],
-	"prefix": "Syslog"
+	"prefix": "Syslog",
+	"url": "https://github.com/demel42/IPSymconSyslog/blob/master/README.md"
 }

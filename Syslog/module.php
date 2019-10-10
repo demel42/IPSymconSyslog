@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../libs/common.php';  // globale Funktionen
 
 class Syslog extends IPSModule
@@ -23,18 +25,18 @@ class Syslog extends IPSModule
         $this->RegisterPropertyInteger('update_interval', '0');
 
         $msgtypes = [
-                ['msgtype' => KL_MESSAGE, 'title' => 'MESSAGE', 'active' => true],
-                ['msgtype' => KL_SUCCESS, 'title' => 'SUCCESS', 'active' => true],
-                ['msgtype' => KL_NOTIFY, 'title' => 'NOTIFY', 'active' => true],
-                ['msgtype' => KL_WARNING, 'title' => 'WARNING', 'active' => true],
-                ['msgtype' => KL_ERROR, 'title' => 'ERROR', 'active' => true],
-                ['msgtype' => KL_DEBUG, 'title' => 'DEBUG', 'active' => false],
-                ['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
-            ];
+            ['msgtype' => KL_MESSAGE, 'title' => 'MESSAGE', 'active' => true],
+            ['msgtype' => KL_SUCCESS, 'title' => 'SUCCESS', 'active' => true],
+            ['msgtype' => KL_NOTIFY, 'title' => 'NOTIFY', 'active' => true],
+            ['msgtype' => KL_WARNING, 'title' => 'WARNING', 'active' => true],
+            ['msgtype' => KL_ERROR, 'title' => 'ERROR', 'active' => true],
+            ['msgtype' => KL_DEBUG, 'title' => 'DEBUG', 'active' => false],
+            ['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
+        ];
         $this->RegisterPropertyString('msgtypes', json_encode($msgtypes));
         $exclude_filters = [
-                ['field' => 'Sender', 'expression' => 'VariableManager'],
-            ];
+            ['field' => 'Sender', 'expression' => 'VariableManager'],
+        ];
         $this->RegisterPropertyString('exclude_filters', json_encode($exclude_filters));
 
         $this->RegisterPropertyBoolean('with_tstamp_vars', false);
@@ -105,26 +107,26 @@ class Syslog extends IPSModule
         $columns = [];
         $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => '150px'];
         $columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
-                                'type' => 'CheckBox', 'caption' => 'Message is active'
-                            ]
-                        ];
+            'type' => 'CheckBox', 'caption' => 'Message is active'
+        ]
+        ];
         $columns[] = ['caption' => 'Type', 'name' => 'msgtype', 'width' => 'auto', 'save' => true, 'visible' => false];
         $formElements[] = ['type' => 'List', 'name' => 'msgtypes', 'caption' => 'Messages', 'rowCount' => 7, 'add' => false, 'delete' => false, 'columns' => $columns];
 
         $options = [
-                ['caption' => 'Sender', 'value' => 'Sender'],
-                ['caption' => 'Text', 'value' => 'Text'],
-            ];
+            ['caption' => 'Sender', 'value' => 'Sender'],
+            ['caption' => 'Text', 'value' => 'Text'],
+        ];
 
         $columns = [];
         $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => 'Sender', 'width' => '150px', 'edit' => [
-                                'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
-                            ]
-                        ];
+            'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
+        ]
+        ];
         $columns[] = ['caption' => 'Regular expression for named field', 'name' => 'expression', 'add' => '', 'width' => 'auto', 'edit' => [
-                                'type' => 'ValidationTextBox'
-                            ]
-                        ];
+            'type' => 'ValidationTextBox'
+        ]
+        ];
         $formElements[] = ['type' => 'List', 'name' => 'exclude_filters', 'caption' => 'Exclude filter', 'rowCount' => 5, 'add' => true, 'delete' => true, 'columns' => $columns];
 
         $formElements[] = ['type' => 'CheckBox', 'name' => 'with_tstamp_vars', 'caption' => 'Variables for Timestamps'];
@@ -135,10 +137,10 @@ class Syslog extends IPSModule
         if (IPS_GetKernelVersion() < 5.2) {
             $formActions[] = ['type' => 'Label', 'label' => '____________________________________________________________________________________________________'];
             $formActions[] = [
-                            'type'    => 'Button',
-                            'caption' => 'Module description',
-                            'onClick' => 'echo "https://github.com/demel42/IPSymconSyslog/blob/master/README.md";'
-                        ];
+                'type'    => 'Button',
+                'caption' => 'Module description',
+                'onClick' => 'echo "https://github.com/demel42/IPSymconSyslog/blob/master/README.md";'
+            ];
         }
 
         $formStatus = [];
@@ -181,14 +183,14 @@ class Syslog extends IPSModule
     public function CheckMessages()
     {
         $type2severity = [
-                KL_ERROR   => 'error',
-                KL_WARNING => 'warning',
-                KL_MESSAGE => 'info',
-                KL_CUSTOM  => 'info',
-                KL_SUCCESS => 'notice',
-                KL_NOTIFY  => 'notice',
-                KL_DEBUG   => 'debug',
-            ];
+            KL_ERROR   => 'error',
+            KL_WARNING => 'warning',
+            KL_MESSAGE => 'info',
+            KL_CUSTOM  => 'info',
+            KL_SUCCESS => 'notice',
+            KL_NOTIFY  => 'notice',
+            KL_DEBUG   => 'debug',
+        ];
 
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
@@ -437,22 +439,22 @@ class Syslog extends IPSModule
     {
         if (defined('LOG_LOCAL0')) {
             $str2facility = [
-                    'auth'    => LOG_AUTH,
-                    'local0'  => LOG_LOCAL0,
-                    'local1'  => LOG_LOCAL1,
-                    'local2'  => LOG_LOCAL2,
-                    'local3'  => LOG_LOCAL3,
-                    'local4'  => LOG_LOCAL4,
-                    'local5'  => LOG_LOCAL5,
-                    'local6'  => LOG_LOCAL6,
-                    'local7'  => LOG_LOCAL7,
-                    'user'    => LOG_USER,
-                ];
+                'auth'    => LOG_AUTH,
+                'local0'  => LOG_LOCAL0,
+                'local1'  => LOG_LOCAL1,
+                'local2'  => LOG_LOCAL2,
+                'local3'  => LOG_LOCAL3,
+                'local4'  => LOG_LOCAL4,
+                'local5'  => LOG_LOCAL5,
+                'local6'  => LOG_LOCAL6,
+                'local7'  => LOG_LOCAL7,
+                'user'    => LOG_USER,
+            ];
         } else {
             $str2facility = [
-                    'auth'    => LOG_AUTH,
-                    'user'    => LOG_USER,
-                ];
+                'auth'    => LOG_AUTH,
+                'user'    => LOG_USER,
+            ];
         }
 
         $str = strtolower($str);
@@ -468,20 +470,20 @@ class Syslog extends IPSModule
     private function decode_severity($str)
     {
         $str2severity = [
-                'emerg'         => LOG_EMERG,
-                'emergency'     => LOG_EMERG,
-                'alert'         => LOG_ALERT,
-                'crit'          => LOG_CRIT,
-                'critical'      => LOG_CRIT,
-                'err'           => LOG_ERR,
-                'error'         => LOG_ERR,
-                'warn'          => LOG_WARNING,
-                'warning'       => LOG_WARNING,
-                'notice'        => LOG_NOTICE,
-                'info'          => LOG_INFO,
-                'informational' => LOG_INFO,
-                'debug'         => LOG_DEBUG,
-            ];
+            'emerg'         => LOG_EMERG,
+            'emergency'     => LOG_EMERG,
+            'alert'         => LOG_ALERT,
+            'crit'          => LOG_CRIT,
+            'critical'      => LOG_CRIT,
+            'err'           => LOG_ERR,
+            'error'         => LOG_ERR,
+            'warn'          => LOG_WARNING,
+            'warning'       => LOG_WARNING,
+            'notice'        => LOG_NOTICE,
+            'info'          => LOG_INFO,
+            'informational' => LOG_INFO,
+            'debug'         => LOG_DEBUG,
+        ];
 
         $str = strtolower($str);
         foreach ($str2severity as $key => $val) {

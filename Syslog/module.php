@@ -264,7 +264,7 @@ class Syslog extends IPSModule
                 case KL_DEBUG:
                 case KL_CUSTOM:
                     $sender = $Data[0];
-                    $text = $Data[1];
+                    $text = utf8_decode($Data[1]);
                     $tstamp = $Data[2];
                     break;
                 default:

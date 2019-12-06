@@ -311,9 +311,11 @@ class Syslog extends IPSModule
                 continue;
             }
 
-            $last_tstamp = $tstamp;
+            if ($tstamp) {
+                $last_tstamp = $tstamp;
+            }
 
-            $ts = date('d.m.Y H:i:s', $tstamp);
+            $ts = $tstamp ? date('d.m.Y H:i:s', $tstamp) : '';
             $n_txt = strlen($text);
             $txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
             $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
@@ -335,7 +337,9 @@ class Syslog extends IPSModule
 
         $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
         if ($with_tstamp_vars) {
-            $this->SetValue('LastMessage', $last_tstamp);
+            if ($last_tstamp) {
+                $this->SetValue('LastMessage', $last_tstamp);
+            }
             $this->SetValue('LastCycle', time());
         }
         $this->SetStatus(IS_ACTIVE);

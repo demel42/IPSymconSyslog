@@ -1,7 +1,7 @@
 # IPSymconSyslog
 
 [![IPS-Version](https://img.shields.io/badge/Symcon_Version-5.0+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Module-Version](https://img.shields.io/badge/Modul_Version-2.8-blue.svg)
+![Module-Version](https://img.shields.io/badge/Modul_Version-2.9-blue.svg)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
@@ -133,40 +133,44 @@ GUIDs
 
 ## 7. Versions-Historie
 
-- 2.8 @ 06.12.2019 07:35<br>
+- 2.9 @ 20.12.2019 13:54
+  - Anpassungen an IPS 5.3
+    - Formular-Elemente: 'label' in 'caption' geändert
+
+- 2.8 @ 06.12.2019 07:35
   - 'Zeitstempel der letzten Nachricht' wird nicht mehr gelöscht, wenn keine Nachricht zu übertragen war
 
-- 2.7 @ 30.10.2019 17:59<br>
+- 2.7 @ 30.10.2019 17:59
   - Umlaut-Problem bei der Übertragung von IPS-Messages gefixed
 
-- 2.6 @ 10.10.2019 17:27<br>
+- 2.6 @ 10.10.2019 17:27
   - Anpassungen an IPS 5.2
     - IPS_SetVariableProfileValues(), IPS_SetVariableProfileDigits() nur bei INTEGER, FLOAT
     - Dokumentation-URL in module.json
   - Umstellung auf strict_types=1
   - Umstellung von StyleCI auf php-cs-fixer
 
-- 2.5 @ 09.08.2019 14:32<br>
+- 2.5 @ 09.08.2019 14:32
   - Schreibfehler korrigiert
 
-- 2.4 @ 02.05.2019 19:31<br>
+- 2.4 @ 02.05.2019 19:31
   - fehlende Übersetzungen (für IS_DELETING, IS_DELETING)
 
-- 2.3 @ 29.03.2019 16:19<br>
+- 2.3 @ 29.03.2019 16:19
   - SetValue() abgesichert
 
-- 2.2 @ 20.03.2019 20:27<br>
+- 2.2 @ 20.03.2019 20:27
   - Konfigurations-Element IntervalBox -> NumberSpinner
   - Anpassungen IPS 5
 
-- 2.1 @ 02.03.2019 09:24<br>
+- 2.1 @ 02.03.2019 09:24
   - Anpassungen IPS 5, Abspaltung Branch _ips_4.4_
   - Protokollierung aller IPS-Protokoll-Messages ...
 
-- 1.1 @ 17.09.2018 17:47<br>
+- 1.1 @ 17.09.2018 17:47
   - Versionshistorie dazu,
   - define's der Variablentypen,
   - Schaltfläche mit Link zu README.md im Konfigurationsdialog
 
-- 1.0 @ 25.03.2018 10:07<br>
-  Initiale Version
+- 1.0 @ 25.03.2018 10:07
+  - Initiale Version

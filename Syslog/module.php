@@ -93,15 +93,15 @@ class Syslog extends IPSModule
         $formElements = [];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'server', 'caption' => 'Server'];
         $formElements[] = ['type' => 'NumberSpinner', 'name' => 'port', 'caption' => 'Port'];
-        $formElements[] = ['type' => 'Label', 'label' => 'default settings'];
-        $formElements[] = ['type' => 'Label', 'label' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'];
+        $formElements[] = ['type' => 'Label', 'caption' => 'default settings'];
+        $formElements[] = ['type' => 'Label', 'caption' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_severity', 'caption' => 'severity'];
-        $formElements[] = ['type' => 'Label', 'label' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
+        $formElements[] = ['type' => 'Label', 'caption' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_facility', 'caption' => 'facility'];
         $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_program', 'caption' => 'program'];
-        $formElements[] = ['type' => 'Label', 'label' => ''];
-        $formElements[] = ['type' => 'Label', 'label' => 'transfer IPS-messages to syslog'];
-        $formElements[] = ['type' => 'Label', 'label' => 'Check messages every X seconds'];
+        $formElements[] = ['type' => 'Label', 'caption' => ''];
+        $formElements[] = ['type' => 'Label', 'caption' => 'transfer IPS-messages to syslog'];
+        $formElements[] = ['type' => 'Label', 'caption' => 'Check messages every X seconds'];
         $formElements[] = ['type' => 'NumberSpinner', 'name' => 'update_interval', 'caption' => 'Seconds'];
 
         $columns = [];
@@ -132,10 +132,10 @@ class Syslog extends IPSModule
         $formElements[] = ['type' => 'CheckBox', 'name' => 'with_tstamp_vars', 'caption' => 'Variables for Timestamps'];
 
         $formActions = [];
-        $formActions[] = ['type' => 'Button', 'label' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
-        $formActions[] = ['type' => 'Button', 'label' => 'Check messages', 'onClick' => 'Syslog_CheckMessages($id);'];
+        $formActions[] = ['type' => 'Button', 'caption' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
+        $formActions[] = ['type' => 'Button', 'caption' => 'Check messages', 'onClick' => 'Syslog_CheckMessages($id);'];
         if (IPS_GetKernelVersion() < 5.2) {
-            $formActions[] = ['type' => 'Label', 'label' => '____________________________________________________________________________________________________'];
+            $formActions[] = ['type' => 'Label', 'caption' => '____________________________________________________________________________________________________'];
             $formActions[] = [
                 'type'    => 'Button',
                 'caption' => 'Module description',

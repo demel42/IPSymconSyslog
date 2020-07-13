@@ -132,6 +132,9 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.10 @ 13.07.2020 14:56
+  - LICENSE.md hinzugefügt
+
 - 2.9 @ 30.12.2019 10:56
   - Anpassungen an IPS 5.3
     - Formular-Elemente: 'label' in 'caption' geändert

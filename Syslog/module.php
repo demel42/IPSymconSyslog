@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../libs/common.php';  // globale Funktionen
+require_once __DIR__ . '/../libs/local.php';   // lokale Funktionen
 
 class Syslog extends IPSModule
 {
-    use SyslogCommon;
+    use SyslogCommonLib;
+    use SyslogLocalLib;
 
     public function Create()
     {
@@ -90,63 +92,177 @@ class Syslog extends IPSModule
 
     public function GetConfigurationForm()
     {
+        $formElements = $this->GetFormElements();
+        $formActions = $this->GetFormActions();
+        $formStatus = $this->GetFormStatus();
+
+        $form = json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
+        if ($form == '') {
+            $this->SendDebug(__FUNCTION__, 'json_error=' . json_last_error_msg(), 0);
+            $this->SendDebug(__FUNCTION__, '=> formElements=' . print_r($formElements, true), 0);
+            $this->SendDebug(__FUNCTION__, '=> formActions=' . print_r($formActions, true), 0);
+            $this->SendDebug(__FUNCTION__, '=> formStatus=' . print_r($formStatus, true), 0);
+        }
+        return $form;
+    }
+
+    private function GetFormElements()
+    {
         $formElements = [];
-        $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'server', 'caption' => 'Server'];
-        $formElements[] = ['type' => 'NumberSpinner', 'name' => 'port', 'caption' => 'Port'];
-        $formElements[] = ['type' => 'Label', 'caption' => 'default settings'];
-        $formElements[] = ['type' => 'Label', 'caption' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'];
-        $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_severity', 'caption' => 'severity'];
-        $formElements[] = ['type' => 'Label', 'caption' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'];
-        $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_facility', 'caption' => 'facility'];
-        $formElements[] = ['type' => 'ValidationTextBox', 'name' => 'default_program', 'caption' => 'program'];
-        $formElements[] = ['type' => 'Label', 'caption' => ''];
-        $formElements[] = ['type' => 'Label', 'caption' => 'transfer IPS-messages to syslog'];
-        $formElements[] = ['type' => 'Label', 'caption' => 'Check messages every X seconds'];
-        $formElements[] = ['type' => 'NumberSpinner', 'name' => 'update_interval', 'caption' => 'Seconds'];
+
+        $formElements[] = [
+            'type'    => 'ValidationTextBox',
+            'name'    => 'server',
+            'caption' => 'Server'
+        ];
+        $formElements[] = [
+            'type'    => 'NumberSpinner',
+            'name'    => 'port',
+            'caption' => 'Port'
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => 'default settings'
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'
+        ];
+        $formElements[] = [
+            'type'    => 'ValidationTextBox',
+            'name'    => 'default_severity',
+            'caption' => 'severity'
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'
+        ];
+        $formElements[] = [
+            'type'    => 'ValidationTextBox',
+            'name'    => 'default_facility',
+            'caption' => 'facility'
+        ];
+        $formElements[] = [
+            'type'    => 'ValidationTextBox',
+            'name'    => 'default_program',
+            'caption' => 'program'
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => ''
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => 'transfer IPS-messages to syslog'
+        ];
+        $formElements[] = [
+            'type'    => 'Label',
+            'caption' => 'Check messages every X seconds'
+        ];
+        $formElements[] = [
+            'type'    => 'NumberSpinner',
+            'name'    => 'update_interval',
+            'caption' => 'Seconds'
+        ];
 
         $columns = [];
-        $columns[] = ['caption' => 'Name', 'name' => 'title', 'width' => '150px'];
-        $columns[] = ['caption' => 'Active', 'name' => 'active', 'width' => 'auto', 'edit' => [
-            'type' => 'CheckBox', 'caption' => 'Message is active'
-        ]
+        $columns[] = [
+            'caption' => 'Name',
+            'name'    => 'title',
+            'width'   => '150px'
         ];
-        $columns[] = ['caption' => 'Type', 'name' => 'msgtype', 'width' => 'auto', 'save' => true, 'visible' => false];
-        $formElements[] = ['type' => 'List', 'name' => 'msgtypes', 'caption' => 'Messages', 'rowCount' => 7, 'add' => false, 'delete' => false, 'columns' => $columns];
+        $columns[] = [
+            'caption' => 'Active',
+            'name'    => 'active',
+            'width'   => 'auto',
+            'edit'    => [
+                'type'    => 'CheckBox',
+                'caption' => 'Message is active'
+            ]
+        ];
+        $columns[] = [
+            'caption' => 'Type',
+            'name'    => 'msgtype',
+            'width'   => 'auto',
+            'save'    => true,
+            'visible' => false];
+        $formElements[] = [
+            'type'     => 'List',
+            'name'     => 'msgtypes',
+            'caption'  => 'Messages',
+            'rowCount' => 7,
+            'add'      => false,
+            'delete'   => false,
+            'columns'  => $columns];
 
         $options = [
-            ['caption' => 'Sender', 'value' => 'Sender'],
-            ['caption' => 'Text', 'value' => 'Text'],
+            [
+                'caption' => 'Sender',
+                'value'   => 'Sender'
+            ],
+            [
+                'caption' => 'Text',
+                'value'   => 'Text'
+            ],
         ];
 
         $columns = [];
-        $columns[] = ['caption' => 'Field', 'name' => 'field', 'add' => 'Sender', 'width' => '150px', 'edit' => [
-            'caption' => 'Field', 'type' => 'Select', 'name' => 'field', 'options' => $options
-        ]
+        $columns[] = [
+            'caption' => 'Field',
+            'name'    => 'field',
+            'add'     => 'Sender',
+            'width'   => '150px',
+            'edit'    => [
+                'caption' => 'Field',
+                'type'    => 'Select',
+                'name'    => 'field',
+                'options' => $options
+            ]
         ];
-        $columns[] = ['caption' => 'Regular expression for named field', 'name' => 'expression', 'add' => '', 'width' => 'auto', 'edit' => [
-            'type' => 'ValidationTextBox'
-        ]
+        $columns[] = [
+            'caption' => 'Regular expression for named field',
+            'name'    => 'expression',
+            'add'     => '',
+            'width'   => 'auto',
+            'edit'    => [
+                'type' => 'ValidationTextBox'
+            ]
         ];
-        $formElements[] = ['type' => 'List', 'name' => 'exclude_filters', 'caption' => 'Exclude filter', 'rowCount' => 5, 'add' => true, 'delete' => true, 'columns' => $columns];
+        $formElements[] = [
+            'type'     => 'List',
+            'name'     => 'exclude_filters',
+            'caption'  => 'Exclude filter',
+            'rowCount' => 5,
+            'add'      => true,
+            'delete'   => true,
+            'columns'  => $columns
+        ];
 
-        $formElements[] = ['type' => 'CheckBox', 'name' => 'with_tstamp_vars', 'caption' => 'Variables for Timestamps'];
+        $formElements[] = [
+            'type'    => 'CheckBox',
+            'name'    => 'with_tstamp_vars',
+            'caption' => 'Variables for Timestamps'
+        ];
 
+        return $formElements;
+    }
+
+    private function GetFormActions()
+    {
         $formActions = [];
-        $formActions[] = ['type' => 'Button', 'caption' => 'Testmessage', 'onClick' => 'Syslog_TestMessage($id);'];
-        $formActions[] = ['type' => 'Button', 'caption' => 'Check messages', 'onClick' => 'Syslog_CheckMessages($id);'];
 
-        $formStatus = [];
-        $formStatus[] = ['code' => IS_CREATING, 'icon' => 'inactive', 'caption' => 'Instance getting created'];
-        $formStatus[] = ['code' => IS_ACTIVE, 'icon' => 'active', 'caption' => 'Instance is active'];
-        $formStatus[] = ['code' => IS_DELETING, 'icon' => 'inactive', 'caption' => 'Instance is deleted'];
-        $formStatus[] = ['code' => IS_INACTIVE, 'icon' => 'inactive', 'caption' => 'Instance is inactive'];
-        $formStatus[] = ['code' => IS_NOTCREATED, 'icon' => 'inactive', 'caption' => 'Instance is not created'];
+        $formActions[] = [
+            'type'    => 'Button',
+            'caption' => 'Testmessage',
+            'onClick' => 'Syslog_TestMessage($id);'
+        ];
+        $formActions[] = [
+            'type'    => 'Button',
+            'caption' => 'Check messages',
+            'onClick' => 'Syslog_CheckMessages($id);'
+        ];
 
-        $formStatus[] = ['code' => IS_INVALIDCONFIG, 'icon' => 'error', 'caption' => 'Instance is inactive (invalid configuration)'];
-        $formStatus[] = ['code' => IS_NOSNAPSHOT, 'icon' => 'error', 'caption' => 'Instance is inactive (no snapshot)'];
-        $formStatus[] = ['code' => IS_BADDATA, 'icon' => 'error', 'caption' => 'Instance is inactive (bad data)'];
-
-        return json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
+        return $formActions;
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)

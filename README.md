@@ -132,8 +132,11 @@ GUIDs
 
 ## 7. Versions-Historie
 
-- 2.10 @ 13.07.2020 14:56
+- 2.10 @ 23.07.2020 15:56 (beta)
   - LICENSE.md hinzugefügt
+  - interne Funktionen sind nun "private"
+  - define's durch statische Klassen-Variablen ersetzt
+  - lokale Funktionen aus common.php in locale.php verlagert
 
 - 2.9 @ 30.12.2019 10:56
   - Anpassungen an IPS 5.3

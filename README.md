@@ -132,7 +132,7 @@ GUIDs
 
 ## 7. Versions-Historie
 
-- 2.11 @ 01.02.2021 16:40 (beta)
+- 2.11 @ 01.02.2021 16:40
   - PHP_CS_FIXER_IGNORE_ENV=1 in github/workflows/style.yml eingefügt
   - Bugfix zu 2.10 (statische Konstante)
 

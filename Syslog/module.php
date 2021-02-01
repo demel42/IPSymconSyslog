@@ -82,7 +82,7 @@ class Syslog extends IPSModule
                 echo 'no value for property "program"';
                 $ok = false;
             }
-            $this->SetStatus($ok ? IS_ACTIVE : IS_INVALIDCONFIG);
+            $this->SetStatus($ok ? IS_ACTIVE : self::$IS_INVALIDCONFIG);
         } else {
             $this->SetStatus(IS_INACTIVE);
         }
@@ -310,7 +310,7 @@ class Syslog extends IPSModule
 
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
         if ($sdata == '') {
-            $this->SetStatus(IS_NOSNAPSHOT);
+            $this->SetStatus(self::$IS_NOSNAPSHOT);
             $old_ts = $TimeStamp;
             $this->InitialSnapshot();
             $TimeStamp = $this->GetBuffer('TimeStamp');
@@ -329,7 +329,7 @@ class Syslog extends IPSModule
             $txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;
             $this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', len=' . strlen($sdata) . ', data=' . $txt . '...', 0);
             $this->LogMessage('unable to decode json-data, error=' . json_last_error() . ', length of data=' . strlen($sdata), KL_NOTIFY);
-            $this->SetStatus(IS_BADDATA);
+            $this->SetStatus(self::$IS_BADDATA);
             return;
         }
 

@@ -1,0 +1,11 @@
+{
+	"translations": {
+		"de": {
+			"__status__": "",
+			"Instance is inactive (no snapshot)": "Instanz ist inaktiv (kein Snapshot)",
+			"Instance is inactive (bad data)": "Instanz ist inaktiv (Daten fehlerhaft)",
+
+			"__end__": ""
+		}
+	}
+}

@@ -1,6 +1,6 @@
 # IPSymconSyslog
 
-[![IPS-Version](https://img.shields.io/badge/Symcon_Version-5.3+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![IPS-Version](https://img.shields.io/badge/Symcon_Version-6.0+-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
@@ -131,6 +131,13 @@ GUIDs
   - Syslog: `{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}`
 
 ## 7. Versions-Historie
+
+- 2.12 @ 06.05.2022 10:03
+  - IPS-Version ist nun minimal 6.0
+  - Anzeige der Modul/Bibliotheks-Informationen, Referenzen und Timer
+  - Implememtierung einer Update-Logik
+  - Überlagerung von Translate und Aufteilung von locale.json in 3 translation.json (Modul, libs und CommonStubs)
+  - diverse interne Änderungen
 
 - 2.11 @ 01.02.2021 16:40
   - PHP_CS_FIXER_IGNORE_ENV=1 in github/workflows/style.yml eingefügt

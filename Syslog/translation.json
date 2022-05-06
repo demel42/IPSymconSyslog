@@ -1,0 +1,53 @@
+{
+	"translations": {
+		"de": {
+			"Syslog": "Syslog",
+
+			"__function__": "CheckConfiguration",
+			"Server must be specified": "Server muss angegeben werden",
+			"Default severity has unsupported value": "Standardwert für Schweregrad hat einen nicht unterstützten Wert",
+			"Default facility has unsupported value": "Standardwert für Kategorie hat einen nicht unterstützten Wert",
+			"Default program must be specified": "Standardwert für Programm muss angegeben werden",
+
+			"__elements__": "",
+			"Disable instance": "Instanz deaktivieren",
+
+			"Basic configuration": "Basis-Konfiguration",
+			"Server": "Server",
+			"Port": "Port",
+
+			"Default settings": "Voreinstellungen", 
+			"severity": "Schweregrad",
+			"possible values: emerg, alert, crit, err, warning, notice, info, debug":
+				"mögliche Werte: emerg, alert, crit, err, warning, notice, info, debug",
+			"facility": "Kategorie",
+			"possible values: auth, local0, local1, local2, local3, local4, local5, local6, local7, user":
+				"mögliche Werte: auth, local0, local1, local2, local3, local4, local5, local6, local7, user",
+			"program": "Programm",
+
+			"Check messages interval": "Prüfintervall für Nachrichten",
+			"Seconds": "Sekunden",
+
+			"Messages": "aktive Nachrichten",
+			"Name": "Bezeichnung",
+			"Active": "aktiv",
+			"Message is active": "Nachricht ist aktiv",
+
+			"Exclude filter": "Ausschluss-Filter",
+			"Field": "Feld",
+			"Regular expression for named field": "Regulärer Ausdruck für das angegebene Feld",
+
+			"Variables for Timestamps": "Variablen für Zeitstempel",
+
+			"__actions__": "",
+			"Testmessage": "Testnachricht",
+			"Check messages": "Prüfe Nachrichten",
+
+			"__variables__": "",
+			"Timestamp of last message": "Zeitstempel der letzten Nachricht",
+			"Last cycle": "Letzter Abgleich",
+
+			"__end__": ""
+		}
+	}
+}

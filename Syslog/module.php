@@ -2,17 +2,28 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../libs/common.php';  // globale Funktionen
-require_once __DIR__ . '/../libs/local.php';   // lokale Funktionen
+require_once __DIR__ . '/../libs/common.php';
+require_once __DIR__ . '/../libs/local.php';
 
 class Syslog extends IPSModule
 {
-    use SyslogCommonLib;
+    use Syslog\StubsCommonLib;
     use SyslogLocalLib;
+
+    private $ModuleDir;
+
+    public function __construct(string $InstanceID)
+    {
+        parent::__construct($InstanceID);
+
+        $this->ModuleDir = __DIR__;
+    }
 
     public function Create()
     {
         parent::Create();
+
+        $this->RegisterPropertyBoolean('module_disable', false);
 
         $this->RegisterPropertyString('server', '');
         $this->RegisterPropertyInteger('port', '514');
@@ -36,6 +47,7 @@ class Syslog extends IPSModule
             ['msgtype' => KL_CUSTOM, 'title' => 'CUSTOM', 'active' => true],
         ];
         $this->RegisterPropertyString('msgtypes', json_encode($msgtypes));
+
         $exclude_filters = [
             ['field' => 'Sender', 'expression' => 'VariableManager'],
         ];
@@ -43,199 +55,246 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyBoolean('with_tstamp_vars', false);
 
-        $this->RegisterTimer('CheckMessages', 0, 'Syslog_CheckMessages(' . $this->InstanceID . ');');
+        $this->RegisterAttributeString('UpdateInfo', '');
+
+        $this->InstallVarProfiles(false);
+
+        $this->RegisterTimer('CheckMessages', 0, $this->GetModulePrefix() . '_CheckMessages(' . $this->InstanceID . ');');
+
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
+    }
+
+    public function MessageSink($tstamp, $senderID, $message, $data)
+    {
+        parent::MessageSink($tstamp, $senderID, $message, $data);
+
+        if ($message == IPS_KERNELMESSAGE && $data[0] == KR_READY) {
+            $this->SetUpdateInterval();
+        }
+    }
+
+    private function CheckModuleConfiguration()
+    {
+        $r = [];
+
+        $server = $this->ReadPropertyString('server');
+        if ($server == '') {
+            $this->SendDebug(__FUNCTION__, '"server" is missing', 0);
+            $r[] = $this->Translate('Server must be specified');
+        }
+
+        $default_severity = $this->ReadPropertyString('default_severity');
+        if ($default_severity != '' && $this->decode_severity($default_severity) == -1) {
+            $this->SendDebug(__FUNCTION__, '"default_severity" has unsupported value "' . $default_severity . '"', 0);
+            $r[] = $this->Translate('Default severity has unsupported value');
+        }
+
+        $default_facility = $this->ReadPropertyString('default_facility');
+        if ($default_facility != '' && $this->decode_facility($default_facility) == -1) {
+            $this->SendDebug(__FUNCTION__, '"default_facility" has unsupported value "' . $default_facility . '"', 0);
+            $r[] = $this->Translate('Default facility has unsupported value');
+        }
+
+        $default_program = $this->ReadPropertyString('default_program');
+        if ($default_program == '') {
+            $this->SendDebug(__FUNCTION__, '"default_program" is missing', 0);
+            $r[] = $this->Translate('Default program must be specified');
+        }
+
+        return $r;
     }
 
     public function ApplyChanges()
     {
         parent::ApplyChanges();
 
-        $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
+        $this->MaintainReferences();
+
+        if ($this->CheckPrerequisites() != false) {
+            $this->MaintainTimer('CheckMessages', 0);
+            $this->SetStatus(self::$IS_INVALIDPREREQUISITES);
+            return;
+        }
+
+        if ($this->CheckUpdate() != false) {
+            $this->MaintainTimer('CheckMessages', 0);
+            $this->SetStatus(self::$IS_UPDATEUNCOMPLETED);
+            return;
+        }
+
+        if ($this->CheckConfiguration() != false) {
+            $this->MaintainTimer('CheckMessages', 0);
+            $this->SetStatus(self::$IS_INVALIDCONFIG);
+            return;
+        }
 
         $vpos = 0;
 
+        $with_tstamp_vars = $this->ReadPropertyBoolean('with_tstamp_vars');
         $this->MaintainVariable('LastMessage', $this->Translate('Timestamp of last message'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, $with_tstamp_vars);
         $this->MaintainVariable('LastCycle', $this->Translate('Last cycle'), VARIABLETYPE_INTEGER, '~UnixTimestamp', $vpos++, $with_tstamp_vars);
 
-        $syslog_server = $this->ReadPropertyString('server');
-        $syslog_port = $this->ReadPropertyInteger('port');
-        $default_severity = $this->ReadPropertyString('default_severity');
-        $default_facility = $this->ReadPropertyString('default_facility');
-        $default_program = $this->ReadPropertyString('default_program');
-
-        if ($syslog_server != '' && $syslog_port > 0) {
-            $ok = true;
-            if ($default_severity != '') {
-                if ($this->decode_severity($default_severity) == -1) {
-                    echo 'unsupported value "' . $default_severity . '" for property "' . severity . '"';
-                    $ok = false;
-                }
-            }
-            if ($default_facility != '') {
-                if ($this->decode_facility($default_facility) == -1) {
-                    echo 'unsupported value "' . $default_facility . '" for property "' . facility . '"';
-                    $ok = false;
-                }
-            }
-            if ($default_program == '') {
-                echo 'no value for property "program"';
-                $ok = false;
-            }
-            $this->SetStatus($ok ? IS_ACTIVE : self::$IS_INVALIDCONFIG);
-        } else {
+        $module_disable = $this->ReadPropertyBoolean('module_disable');
+        if ($module_disable) {
+            $this->MaintainTimer('UpdateStatus', 0);
             $this->SetStatus(IS_INACTIVE);
+            return;
         }
+
+        $this->SetStatus(IS_ACTIVE);
 
         $this->SetUpdateInterval();
     }
 
-    public function GetConfigurationForm()
-    {
-        $formElements = $this->GetFormElements();
-        $formActions = $this->GetFormActions();
-        $formStatus = $this->GetFormStatus();
-
-        $form = json_encode(['elements' => $formElements, 'actions' => $formActions, 'status' => $formStatus]);
-        if ($form == '') {
-            $this->SendDebug(__FUNCTION__, 'json_error=' . json_last_error_msg(), 0);
-            $this->SendDebug(__FUNCTION__, '=> formElements=' . print_r($formElements, true), 0);
-            $this->SendDebug(__FUNCTION__, '=> formActions=' . print_r($formActions, true), 0);
-            $this->SendDebug(__FUNCTION__, '=> formStatus=' . print_r($formStatus, true), 0);
-        }
-        return $form;
-    }
-
     private function GetFormElements()
     {
-        $formElements = [];
+        $formElements = $this->GetCommonFormElements('Syslog');
+
+        if ($this->GetStatus() == self::$IS_UPDATEUNCOMPLETED) {
+            return $formElements;
+        }
 
         $formElements[] = [
-            'type'    => 'ValidationTextBox',
-            'name'    => 'server',
-            'caption' => 'Server'
+            'name'    => 'module_disable',
+            'type'    => 'CheckBox',
+            'caption' => 'Disable instance'
         ];
+
         $formElements[] = [
-            'type'    => 'NumberSpinner',
-            'name'    => 'port',
-            'caption' => 'Port'
+            'type'    => 'ExpansionPanel',
+            'items'   => [
+                [
+                    'name'    => 'server',
+                    'type'    => 'ValidationTextBox',
+                    'caption' => 'Server',
+                ],
+                [
+                    'name'    => 'port',
+                    'type'    => 'NumberSpinner',
+                    'caption' => 'Port',
+                ],
+            ],
+            'caption' => 'Basic configuration',
         ];
+
         $formElements[] = [
-            'type'    => 'Label',
-            'caption' => 'default settings'
+            'type'    => 'ExpansionPanel',
+            'items'   => [
+                [
+                    'type'    => 'RowLayout',
+                    'items'   => [
+                        [
+                            'name'    => 'default_severity',
+                            'type'    => 'ValidationTextBox',
+                            'caption' => 'severity',
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => 'possible values: emerg, alert, crit, err, warning, notice, info, debug',
+                        ],
+                    ],
+                ],
+                [
+                    'type'    => 'RowLayout',
+                    'items'   => [
+                        [
+                            'name'    => 'default_facility',
+                            'type'    => 'ValidationTextBox',
+                            'caption' => 'facility',
+                        ],
+                        [
+                            'type'    => 'Label',
+                            'caption' => 'possible values: auth, local0, local1, local2, local3, local4, local5, local6, local7, user',
+                        ],
+                    ],
+                ],
+                [
+                    'name'    => 'default_program',
+                    'type'    => 'ValidationTextBox',
+                    'caption' => 'program',
+                ],
+                [
+                    'type'     => 'List',
+                    'name'     => 'msgtypes',
+                    'rowCount' => 7,
+                    'add'      => false,
+                    'delete'   => false,
+                    'columns'  => [
+                        [
+                            'name'    => 'title',
+                            'width'   => '150px',
+                            'caption' => 'Name',
+                        ],
+                        [
+                            'name'    => 'active',
+                            'width'   => 'auto',
+                            'edit'    => [
+                                'type'    => 'CheckBox',
+                                'caption' => 'Message is active'
+                            ],
+                            'caption' => 'Active',
+                        ],
+                        [
+                            'name'    => 'msgtype',
+                            'width'   => 'auto',
+                            'save'    => true,
+                            'visible' => false,
+                            'caption' => 'Type',
+                        ],
+                    ],
+                    'caption'  => 'Messages',
+                ],
+            ],
+            'caption' => 'Default settings',
         ];
+
         $formElements[] = [
-            'type'    => 'Label',
-            'caption' => 'possible values for severity: emerg, alert, crit, err, warning, notice, info, debug'
-        ];
-        $formElements[] = [
-            'type'    => 'ValidationTextBox',
-            'name'    => 'default_severity',
-            'caption' => 'severity'
-        ];
-        $formElements[] = [
-            'type'    => 'Label',
-            'caption' => 'possible values for facility: auth, local0, local1, local2, local3, local4, local5, local6, local7, user'
-        ];
-        $formElements[] = [
-            'type'    => 'ValidationTextBox',
-            'name'    => 'default_facility',
-            'caption' => 'facility'
-        ];
-        $formElements[] = [
-            'type'    => 'ValidationTextBox',
-            'name'    => 'default_program',
-            'caption' => 'program'
-        ];
-        $formElements[] = [
-            'type'    => 'Label',
-            'caption' => ''
-        ];
-        $formElements[] = [
-            'type'    => 'Label',
-            'caption' => 'transfer IPS-messages to syslog'
-        ];
-        $formElements[] = [
-            'type'    => 'Label',
-            'caption' => 'Check messages every X seconds'
-        ];
-        $formElements[] = [
-            'type'    => 'NumberSpinner',
             'name'    => 'update_interval',
-            'caption' => 'Seconds'
+            'type'    => 'NumberSpinner',
+            'minimum' => 0,
+            'suffix'  => 'Seconds',
+            'caption' => 'Check messages interval',
         ];
 
-        $columns = [];
-        $columns[] = [
-            'caption' => 'Name',
-            'name'    => 'title',
-            'width'   => '150px'
-        ];
-        $columns[] = [
-            'caption' => 'Active',
-            'name'    => 'active',
-            'width'   => 'auto',
-            'edit'    => [
-                'type'    => 'CheckBox',
-                'caption' => 'Message is active'
-            ]
-        ];
-        $columns[] = [
-            'caption' => 'Type',
-            'name'    => 'msgtype',
-            'width'   => 'auto',
-            'save'    => true,
-            'visible' => false];
-        $formElements[] = [
-            'type'     => 'List',
-            'name'     => 'msgtypes',
-            'caption'  => 'Messages',
-            'rowCount' => 7,
-            'add'      => false,
-            'delete'   => false,
-            'columns'  => $columns];
-
-        $options = [
-            [
-                'caption' => 'Sender',
-                'value'   => 'Sender'
-            ],
-            [
-                'caption' => 'Text',
-                'value'   => 'Text'
-            ],
-        ];
-
-        $columns = [];
-        $columns[] = [
-            'caption' => 'Field',
-            'name'    => 'field',
-            'add'     => 'Sender',
-            'width'   => '150px',
-            'edit'    => [
-                'caption' => 'Field',
-                'type'    => 'Select',
-                'name'    => 'field',
-                'options' => $options
-            ]
-        ];
-        $columns[] = [
-            'caption' => 'Regular expression for named field',
-            'name'    => 'expression',
-            'add'     => '',
-            'width'   => 'auto',
-            'edit'    => [
-                'type' => 'ValidationTextBox'
-            ]
-        ];
         $formElements[] = [
             'type'     => 'List',
             'name'     => 'exclude_filters',
-            'caption'  => 'Exclude filter',
             'rowCount' => 5,
             'add'      => true,
             'delete'   => true,
-            'columns'  => $columns
+            'columns'  => [
+                [
+                    'caption' => 'Field',
+                    'name'    => 'field',
+                    'add'     => 'Sender',
+                    'width'   => '150px',
+                    'edit'    => [
+                        'name'    => 'field',
+                        'type'    => 'Select',
+                        'options' => [
+                            [
+                                'caption' => 'Sender',
+                                'value'   => 'Sender'
+                            ],
+                            [
+                                'caption' => 'Text',
+                                'value'   => 'Text'
+                            ],
+                        ],
+                        'caption' => 'Field',
+                    ]
+                ],
+                [
+                    'name'    => 'expression',
+                    'width'   => 'auto',
+                    'add'     => '',
+                    'edit'    => [
+                        'type' => 'ValidationTextBox'
+                    ],
+                    'caption' => 'Regular expression for named field',
+                ],
+            ],
+            'caption'  => 'Exclude filter',
         ];
 
         $formElements[] = [
@@ -251,34 +310,68 @@ class Syslog extends IPSModule
     {
         $formActions = [];
 
+        if ($this->GetStatus() == self::$IS_UPDATEUNCOMPLETED) {
+            $formActions[] = $this->GetCompleteUpdateFormAction();
+
+            $formActions[] = $this->GetInformationFormAction();
+            $formActions[] = $this->GetReferencesFormAction();
+
+            return $formActions;
+        }
+
         $formActions[] = [
             'type'    => 'Button',
             'caption' => 'Testmessage',
-            'onClick' => 'Syslog_TestMessage($id);'
+            'onClick' => $this->GetModulePrefix() . '_TestMessage($id);'
         ];
+
         $formActions[] = [
             'type'    => 'Button',
             'caption' => 'Check messages',
-            'onClick' => 'Syslog_CheckMessages($id);'
+            'onClick' => $this->GetModulePrefix() . '_CheckMessages($id);'
         ];
+
+        $formActions[] = [
+            'type'      => 'ExpansionPanel',
+            'caption'   => 'Expert area',
+            'expanded ' => false,
+            'items'     => [
+                [
+                    'type'    => 'Button',
+                    'caption' => 'Re-install variable-profiles',
+                    'onClick' => $this->GetModulePrefix() . '_InstallVarProfiles($id, true);'
+                ],
+            ],
+        ];
+
+        $formActions[] = $this->GetInformationFormAction();
+        $formActions[] = $this->GetReferencesFormAction();
 
         return $formActions;
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function RequestAction($ident, $value)
     {
-        parent::MessageSink($TimeStamp, $SenderID, $Message, $Data);
-
-        if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
-            $this->InitialSnapshot();
+        if ($this->CommonRequestAction($ident, $value)) {
+            return;
         }
+        switch ($ident) {
+            default:
+                $this->SendDebug(__FUNCTION__, 'invalid ident ' . $ident, 0);
+                break;
+        }
+    }
+
+    public function TestMessage()
+    {
+        $this->Message('Testnachricht');
     }
 
     protected function SetUpdateInterval()
     {
         $sec = $this->ReadPropertyInteger('update_interval');
         $msec = $sec > 0 ? $sec * 1000 : 0;
-        $this->SetTimerInterval('CheckMessages', $msec);
+        $this->MaintainTimer('CheckMessages', $msec);
     }
 
     protected function InitialSnapshot()
@@ -299,6 +392,11 @@ class Syslog extends IPSModule
             KL_NOTIFY  => 'notice',
             KL_DEBUG   => 'debug',
         ];
+
+        if ($this->CheckStatus() == self::$STATUS_INVALID) {
+            $this->SendDebug(__FUNCTION__, $this->GetStatusText() . ' => skip', 0);
+            return;
+        }
 
         $TimeStamp = $this->GetBuffer('TimeStamp');
         if ($TimeStamp == '' || $TimeStamp == 0) {
@@ -453,13 +551,13 @@ class Syslog extends IPSModule
         $this->SetStatus(IS_ACTIVE);
     }
 
-    public function TestMessage()
-    {
-        $this->Message('Testnachricht');
-    }
-
     public function Message(string $msg, string $severity = null, string $facility = null, string $program = null)
     {
+        if ($this->CheckStatus() == self::$STATUS_INVALID) {
+            $this->SendDebug(__FUNCTION__, $this->GetStatusText() . ' => skip', 0);
+            return;
+        }
+
         $server = $this->ReadPropertyString('server');
         $port = $this->ReadPropertyInteger('port');
         $default_severity = $this->ReadPropertyString('default_severity');

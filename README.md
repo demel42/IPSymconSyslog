@@ -132,6 +132,9 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.12.1 @ 10.05.2022 15:06
+  - update submodule CommonStubs
+
 - 2.12 @ 06.05.2022 10:03
   - IPS-Version ist nun minimal 6.0
   - Anzeige der Modul/Bibliotheks-Informationen, Referenzen und Timer

@@ -59,7 +59,7 @@ class Syslog extends IPSModule
 
         $this->InstallVarProfiles(false);
 
-        $this->RegisterTimer('CheckMessages', 0, $this->GetModulePrefix() . '_CheckMessages(' . $this->InstanceID . ');');
+        $this->RegisterTimer('CheckMessages', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "CheckMessages", "");');
 
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
@@ -112,19 +112,19 @@ class Syslog extends IPSModule
 
         if ($this->CheckPrerequisites() != false) {
             $this->MaintainTimer('CheckMessages', 0);
-            $this->SetStatus(self::$IS_INVALIDPREREQUISITES);
+            $this->MaintainStatus(self::$IS_INVALIDPREREQUISITES);
             return;
         }
 
         if ($this->CheckUpdate() != false) {
             $this->MaintainTimer('CheckMessages', 0);
-            $this->SetStatus(self::$IS_UPDATEUNCOMPLETED);
+            $this->MaintainStatus(self::$IS_UPDATEUNCOMPLETED);
             return;
         }
 
         if ($this->CheckConfiguration() != false) {
             $this->MaintainTimer('CheckMessages', 0);
-            $this->SetStatus(self::$IS_INVALIDCONFIG);
+            $this->MaintainStatus(self::$IS_INVALIDCONFIG);
             return;
         }
 
@@ -136,14 +136,16 @@ class Syslog extends IPSModule
 
         $module_disable = $this->ReadPropertyBoolean('module_disable');
         if ($module_disable) {
-            $this->MaintainTimer('UpdateStatus', 0);
-            $this->SetStatus(IS_INACTIVE);
+            $this->MaintainTimer('CheckMessages', 0);
+            $this->MaintainStatus(IS_INACTIVE);
             return;
         }
 
-        $this->SetStatus(IS_ACTIVE);
+        $this->MaintainStatus(IS_ACTIVE);
 
-        $this->SetUpdateInterval();
+        if (IPS_GetKernelRunlevel() == KR_READY) {
+            $this->SetUpdateInterval();
+        }
     }
 
     private function GetFormElements()
@@ -322,13 +324,13 @@ class Syslog extends IPSModule
         $formActions[] = [
             'type'    => 'Button',
             'caption' => 'Testmessage',
-            'onClick' => $this->GetModulePrefix() . '_TestMessage($id);'
+            'onClick' => 'IPS_RequestAction(' . $this->InstanceID . ', "TestMessage", "");',
         ];
 
         $formActions[] = [
             'type'    => 'Button',
             'caption' => 'Check messages',
-            'onClick' => $this->GetModulePrefix() . '_CheckMessages($id);'
+            'onClick' => 'IPS_RequestAction(' . $this->InstanceID . ', "CheckMessages", "");',
         ];
 
         $formActions[] = [
@@ -336,11 +338,7 @@ class Syslog extends IPSModule
             'caption'   => 'Expert area',
             'expanded ' => false,
             'items'     => [
-                [
-                    'type'    => 'Button',
-                    'caption' => 'Re-install variable-profiles',
-                    'onClick' => $this->GetModulePrefix() . '_InstallVarProfiles($id, true);'
-                ],
+                $this->GetInstallVarProfilesFormItem(),
             ],
         ];
 
@@ -350,8 +348,28 @@ class Syslog extends IPSModule
         return $formActions;
     }
 
+    private function LocalRequestAction($ident, $value)
+    {
+        $r = true;
+        switch ($ident) {
+            case 'TestMessage':
+                $this->TestMessage();
+                break;
+            case 'CheckMessages':
+                $this->CheckMessages();
+                break;
+            default:
+                $r = false;
+                break;
+        }
+        return $r;
+    }
+
     public function RequestAction($ident, $value)
     {
+        if ($this->LocalRequestAction($ident, $value)) {
+            return;
+        }
         if ($this->CommonRequestAction($ident, $value)) {
             return;
         }
@@ -362,26 +380,26 @@ class Syslog extends IPSModule
         }
     }
 
-    public function TestMessage()
+    private function TestMessage()
     {
         $this->Message('Testnachricht');
     }
 
-    protected function SetUpdateInterval()
+    private function SetUpdateInterval()
     {
         $sec = $this->ReadPropertyInteger('update_interval');
         $msec = $sec > 0 ? $sec * 1000 : 0;
         $this->MaintainTimer('CheckMessages', $msec);
     }
 
-    protected function InitialSnapshot()
+    private function InitialSnapshot()
     {
         $r = IPS_GetSnapshotChanges(0);
         $snapshot = json_decode($r, true);
         $this->SetBuffer('TimeStamp', $snapshot[0]['TimeStamp']);
     }
 
-    public function CheckMessages()
+    private function CheckMessages()
     {
         $type2severity = [
             KL_ERROR   => 'error',
@@ -408,7 +426,7 @@ class Syslog extends IPSModule
 
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
         if ($sdata == '') {
-            $this->SetStatus(self::$IS_NOSNAPSHOT);
+            $this->MaintainStatus(self::$IS_NOSNAPSHOT);
             $old_ts = $TimeStamp;
             $this->InitialSnapshot();
             $TimeStamp = $this->GetBuffer('TimeStamp');
@@ -427,7 +445,7 @@ class Syslog extends IPSModule
             $txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;
             $this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', len=' . strlen($sdata) . ', data=' . $txt . '...', 0);
             $this->LogMessage('unable to decode json-data, error=' . json_last_error() . ', length of data=' . strlen($sdata), KL_NOTIFY);
-            $this->SetStatus(self::$IS_BADDATA);
+            $this->MaintainStatus(self::$IS_BADDATA);
             return;
         }
 
@@ -469,7 +487,7 @@ class Syslog extends IPSModule
                 case KL_ERROR:
                 case KL_DEBUG:
                 case KL_CUSTOM:
-                    $sender = $Data[0];
+                    $sender = trim($Data[0]);
                     $text = utf8_decode($Data[1]);
                     $tstamp = $Data[2];
                     break;
@@ -548,7 +566,10 @@ class Syslog extends IPSModule
             }
             $this->SetValue('LastCycle', time());
         }
-        $this->SetStatus(IS_ACTIVE);
+
+        $this->MaintainStatus(IS_ACTIVE);
+
+        $this->SendDebug(__FUNCTION__, $this->PrintTimer('CheckMessages'), 0);
     }
 
     public function Message(string $msg, string $severity = null, string $facility = null, string $program = null)
@@ -588,7 +609,7 @@ class Syslog extends IPSModule
         $pri = $_facility + $_severity;
         $host = gethostname();
         $timestamp = date('Y-m-d\TH:i:sP');
-        $msgid = date('Uu');
+        $msgid = '-';
         $procid = '-';
         $sdata = '-';
 

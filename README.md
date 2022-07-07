@@ -132,6 +132,14 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.13 @ 07.07.2022 12:04
+  - einige Funktionen (GetFormElements, GetFormActions) waren fehlerhafterweise "protected" und nicht "private"
+  - interne Funktionen sind nun private und ggfs nur noch via IPS_RequestAction() erreichbar
+  - Fix: Angabe der Kompatibilität auf 6.2 korrigiert
+  - Verbesserung: IPS-Status wird nur noch gesetzt, wenn er sich ändert
+  - Verbesserung: Feld 'MSGID' der Syslog-Nachricht bleibt nun leer
+  - update submodule CommonStubs
+
 - 2.12.2 @ 17.05.2022 15:38
   - update submodule CommonStubs
     Fix: Absicherung gegen fehlende Objekte

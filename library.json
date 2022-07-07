@@ -4,9 +4,9 @@
 	"name": "Syslog-Client",
 	"url": "https://github.com/demel42/IPSymconSyslog",
 	"compatibility": {
-		"version": "6.0"
+		"version": "6.2"
 	},
-	"version": "2.12.2",
+	"version": "2.13",
 	"build": 0,
-	"date": 1652794739
+	"date": 1657188293
 }

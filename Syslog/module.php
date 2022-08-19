@@ -424,22 +424,46 @@ class Syslog extends IPSModule
 
         $this->SendDebug(__FUNCTION__, 'start cycle with TimeStamp=' . $TimeStamp, 0);
 
+        $memory_limit = ini_get('memory_limit');
+        if (preg_match('/^(\d+)(.)$/', $memory_limit, $matches)) {
+            if ($matches[2] == 'M') {
+                $memory_limit = $matches[1] * 1024 * 1024; // nnnM -> nnn MB
+            } elseif ($matches[2] == 'K') {
+                $memory_limit = $matches[1] * 1024; // nnnK -> nnn KB
+            }
+        }
+
         $sdata = @IPS_GetSnapshotChanges($TimeStamp);
+        if ($sdata != '') {
+            $slen = strlen($sdata);
+            if ($slen > ($memory_limit / 2)) {
+                $this->SendDebug(__FUNCTION__, 'snapshot (#' . $TimeStamp . ') is too large (len=' . $slen . ') - reset', 0);
+                $this->LogMessage('snapshot (#' . $TimeStamp . ') is too large (len=' . $slen . ') - reset', KL_NOTIFY);
+                $sdata = '';
+            } else {
+                @$udata = utf8_encode($sdata);
+                if ($udata == false) {
+                    $this->SendDebug(__FUNCTION__, 'snapshot (#' . $TimeStamp . ') is malformed (len=' . $slen . ') - reset', 0);
+                    $this->LogMessage('snapshot (#' . $TimeStamp . ') is malformed (len=' . $slen . ') - reset', KL_NOTIFY);
+                    $sdata = '';
+                }
+            }
+        }
         if ($sdata == '') {
             $this->MaintainStatus(self::$IS_NOSNAPSHOT);
             $old_ts = $TimeStamp;
             $this->InitialSnapshot();
             $TimeStamp = $this->GetBuffer('TimeStamp');
             $this->SendDebug(__FUNCTION__, 'unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', 0);
-            $this->LogMessage('unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . ') , resetting', KL_NOTIFY);
+            $this->LogMessage('unable to get snapshot (old=' . $old_ts . ', new=' . $TimeStamp . '), resetting', KL_NOTIFY);
             $sdata = @IPS_GetSnapshotChanges($TimeStamp);
             if ($sdata == '') {
                 $this->SendDebug(__FUNCTION__, 'unable to get snapshot (#' . $TimeStamp . '), reset failed', 0);
-                $this->LogMessage('unable to get snapshot (#' . $TimeStamp . ') , reset failed', KL_NOTIFY);
+                $this->LogMessage('unable to get snapshot (#' . $TimeStamp . '), reset failed', KL_NOTIFY);
                 return;
             }
+            $udata = utf8_encode($sdata);
         }
-        $udata = utf8_encode($sdata);
         $snapshot = json_decode($udata, true);
         if ($snapshot == '') {
             $txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;

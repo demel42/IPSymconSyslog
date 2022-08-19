@@ -132,6 +132,11 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.14 @ 19.08.2022 10:49
+  - Absicherung gegen Fehler bei zu großem Memory-Bedarf bei extrem gㄦoßem Snapshot
+    Es gibt dann keine Fehler mehr, jedoch werden Nachrichten aus diesen Snapshot nicht mehr weitergeleitet
+  - update submodule CommonStubs
+
 - 2.13 @ 07.07.2022 12:04
   - einige Funktionen (GetFormElements, GetFormActions) waren fehlerhafterweise "protected" und nicht "private"
   - interne Funktionen sind nun private und ggfs nur noch via IPS_RequestAction() erreichbar

@@ -133,7 +133,7 @@ GUIDs
 ## 7. Versions-Historie
 
 - 2.14 @ 19.08.2022 10:49
-  - Absicherung gegen Fehler bei zu großem Memory-Bedarf bei extrem gㄦoßem Snapshot
+  - Absicherung gegen Fehler bei zu großem Memory-Bedarf bei extrem großem Snapshot
     Es gibt dann keine Fehler mehr, jedoch werden Nachrichten aus diesen Snapshot nicht mehr weitergeleitet
   - update submodule CommonStubs
 

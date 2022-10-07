@@ -132,6 +132,10 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.14.1 @ 07.10.2022 13:59
+  - update submodule CommonStubs
+    Fix: Update-Prüfung wieder funktionsfähig
+
 - 2.14 @ 19.08.2022 10:49
   - Absicherung gegen Fehler bei zu großem Memory-Bedarf bei extrem großem Snapshot
     Es gibt dann keine Fehler mehr, jedoch werden Nachrichten aus diesen Snapshot nicht mehr weitergeleitet

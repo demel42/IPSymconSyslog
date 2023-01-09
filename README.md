@@ -132,6 +132,10 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.15 @ 09.01.2023 17:17
+  - Neu: Instanz-Funktionen stehen nun auch als Aktion zur Verfügung
+  - update submodule CommonStubs
+
 - 2.14.1 @ 07.10.2022 13:59
   - update submodule CommonStubs
     Fix: Update-Prüfung wieder funktionsfähig

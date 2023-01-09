@@ -1,0 +1,34 @@
+{
+	"id": "{A0625EFC-A262-FD2E-5D80-BBA9802DA41D}",
+	"caption": "Send messages to syslog as \"warning\"",
+	"form": [
+		{
+			"type": "ValidationTextBox",
+			"name": "MESSAGE",
+			"caption": "Message"
+		}
+	],
+	"action": "Syslog_Info($_IPS['TARGET'], $_IPS['MESSAGE']);",
+	"restrictions": {
+		"objectType": [
+			1
+		],
+		"moduleID": [
+			"{2D3D36C0-E7AC-4F4C-ACB7-D54D87011B0E}"
+		],
+		"includeEnvironments": [
+			"TestCommands",
+			"Default"
+		]
+	},
+	"priority": 10,
+	"category": "target",
+	"format": "Send message to syslog with severity \"warning\" and \"{MESSAGE}\"",
+	"locale": {
+		"de": {
+			"Send messages to syslog as \"warning\"": "Nachricht an Syslog als \"warning\" schicken",
+			"Message": "Nachrichten-Text",
+			"Send message to syslog with severity \"warning\" and \"{MESSAGE}\"": "Nachricht an Syslog mit Schweregrad \"warning\" und \"Nachricht\" senden"
+		}
+	}
+}

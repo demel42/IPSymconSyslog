@@ -382,7 +382,7 @@ class Syslog extends IPSModule
 
     private function TestMessage()
     {
-        $this->Message('Testnachricht');
+        $this->Message('Testnachricht äöüÄÖÜß');
     }
 
     private function SetUpdateInterval()
@@ -440,13 +440,6 @@ class Syslog extends IPSModule
                 $this->SendDebug(__FUNCTION__, 'snapshot (#' . $TimeStamp . ') is too large (len=' . $slen . ') - reset', 0);
                 $this->LogMessage('snapshot (#' . $TimeStamp . ') is too large (len=' . $slen . ') - reset', KL_NOTIFY);
                 $sdata = '';
-            } else {
-                @$udata = utf8_encode($sdata);
-                if ($udata == false) {
-                    $this->SendDebug(__FUNCTION__, 'snapshot (#' . $TimeStamp . ') is malformed (len=' . $slen . ') - reset', 0);
-                    $this->LogMessage('snapshot (#' . $TimeStamp . ') is malformed (len=' . $slen . ') - reset', KL_NOTIFY);
-                    $sdata = '';
-                }
             }
         }
         if ($sdata == '') {
@@ -462,11 +455,10 @@ class Syslog extends IPSModule
                 $this->LogMessage('unable to get snapshot (#' . $TimeStamp . '), reset failed', KL_NOTIFY);
                 return;
             }
-            $udata = utf8_encode($sdata);
         }
-        $snapshot = json_decode($udata, true);
+        $snapshot = json_decode($sdata, true);
         if ($snapshot == '') {
-            $txt = strlen($udata) > 7000 ? substr($udata, 0, 7000) . '...' : $r;
+            $txt = strlen($sdata) > 7000 ? substr($sdata, 0, 7000) . '...' : $r;
             $this->SendDebug(__FUNCTION__, 'unable to decode json-data, error=' . json_last_error() . ', len=' . strlen($sdata) . ', data=' . $txt . '...', 0);
             $this->LogMessage('unable to decode json-data, error=' . json_last_error() . ', length of data=' . strlen($sdata), KL_NOTIFY);
             $this->MaintainStatus(self::$IS_BADDATA);
@@ -512,7 +504,7 @@ class Syslog extends IPSModule
                 case KL_DEBUG:
                 case KL_CUSTOM:
                     $sender = trim($Data[0]);
-                    $text = utf8_decode($Data[1]);
+                    $text = $Data[1];
                     $tstamp = $Data[2];
                     break;
                 default:
@@ -566,7 +558,7 @@ class Syslog extends IPSModule
             $ts = $tstamp ? date('d.m.Y H:i:s', $tstamp) : '';
             $n_txt = strlen($text);
             $txt = $n_txt > 1024 ? substr($text, 0, 1024) . '...' : $text;
-            $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . utf8_decode($txt) . ', tstamp=' . $ts, 0);
+            $this->SendDebug(__FUNCTION__, 'SenderID=' . $SenderID . ', Message=' . $Message . ', sender=' . $sender . ', tetx-len=' . $n_txt . ', text=' . $txt . ', tstamp=' . $ts, 0);
 
             if (in_array($Message, $active_types) && isset($type2severity[$Message])) {
                 $severity = $type2severity[$Message];
@@ -636,6 +628,8 @@ class Syslog extends IPSModule
         $msgid = '-';
         $procid = '-';
         $sdata = '-';
+		// prefix msg with UTF8-BOM (Byte Order Mark) to inform the syslog that it is UTF8
+		$msg = chr(0xEF) . chr(0xBB) . chr(0xBF) . $msg;
 
         $syslog_message = '<' . $pri . '>'
             . '1'

@@ -10,13 +10,16 @@ class Syslog extends IPSModule
     use Syslog\StubsCommonLib;
     use SyslogLocalLib;
 
-    private $ModuleDir;
-
     public function __construct(string $InstanceID)
     {
         parent::__construct($InstanceID);
 
-        $this->ModuleDir = __DIR__;
+        $this->CommonContruct(__DIR__);
+    }
+
+    public function __destruct()
+    {
+        $this->CommonDestruct();
     }
 
     public function Create()
@@ -55,7 +58,8 @@ class Syslog extends IPSModule
 
         $this->RegisterPropertyBoolean('with_tstamp_vars', false);
 
-        $this->RegisterAttributeString('UpdateInfo', '');
+        $this->RegisterAttributeString('UpdateInfo', json_encode([]));
+        $this->RegisterAttributeString('ModuleStats', json_encode([]));
 
         $this->InstallVarProfiles(false);
 
@@ -628,8 +632,8 @@ class Syslog extends IPSModule
         $msgid = '-';
         $procid = '-';
         $sdata = '-';
-		// prefix msg with UTF8-BOM (Byte Order Mark) to inform the syslog that it is UTF8
-		$msg = chr(0xEF) . chr(0xBB) . chr(0xBF) . $msg;
+        // prefix msg with UTF8-BOM (Byte Order Mark) to inform the syslog that it is UTF8
+        $msg = chr(0xEF) . chr(0xBB) . chr(0xBF) . $msg;
 
         $syslog_message = '<' . $pri . '>'
             . '1'

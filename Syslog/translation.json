@@ -39,6 +39,10 @@
 
 			"Variables for Timestamps": "Variablen für Zeitstempel",
 
+			"Syslog format": "Syslog-Format",
+			"BSD (RFC3164)": "BSD (RFC3164)",
+			"IETF (RFC5424)": "IETF (RFC5424)",
+
 			"__actions__": "",
 			"Testmessage": "Testnachricht",
 			"Check messages": "Prüfe Nachrichten",

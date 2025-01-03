@@ -132,6 +132,11 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.19 @ 03.01.2025 14:17
+  - Verbesserung: Unterstützung von BSD und IETF-Syslog-Format
+  - interne Änderung
+  - update submodule CommonStubs
+
 - 2.18 @ 06.02.2024 09:46
   - Verbesserung: Angleichung interner Bibliotheken anlässlich IPS 7
   - update submodule CommonStubs

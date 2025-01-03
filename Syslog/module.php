@@ -10,11 +10,14 @@ class Syslog extends IPSModule
     use Syslog\StubsCommonLib;
     use SyslogLocalLib;
 
+    public static $SYSLOG_FORMAT_BSD = 1;
+    public static $SYSLOG_FORMAT_IETF = 2;
+
     public function __construct(string $InstanceID)
     {
         parent::__construct($InstanceID);
 
-        $this->CommonContruct(__DIR__);
+        $this->CommonConstruct(__DIR__);
     }
 
     public function __destruct()
@@ -57,6 +60,8 @@ class Syslog extends IPSModule
         $this->RegisterPropertyString('exclude_filters', json_encode($exclude_filters));
 
         $this->RegisterPropertyBoolean('with_tstamp_vars', false);
+
+        $this->RegisterPropertyInteger('syslog_format', self::$SYSLOG_FORMAT_IETF);
 
         $this->RegisterAttributeString('UpdateInfo', json_encode([]));
         $this->RegisterAttributeString('ModuleStats', json_encode([]));
@@ -288,7 +293,7 @@ class Syslog extends IPSModule
                             ],
                         ],
                         'caption' => 'Field',
-                    ]
+                    ],
                 ],
                 [
                     'name'    => 'expression',
@@ -307,6 +312,22 @@ class Syslog extends IPSModule
             'type'    => 'CheckBox',
             'name'    => 'with_tstamp_vars',
             'caption' => 'Variables for Timestamps'
+        ];
+
+        $formElements[] = [
+            'name'    => 'syslog_format',
+            'type'    => 'Select',
+            'options' => [
+                [
+                    'caption' => 'BSD (RFC3164)',
+                    'value'   => self::$SYSLOG_FORMAT_BSD,
+                ],
+                [
+                    'caption' => 'IETF (RFC5424)',
+                    'value'   => self::$SYSLOG_FORMAT_IETF,
+                ],
+            ],
+            'caption' => 'Syslog format',
         ];
 
         return $formElements;
@@ -604,6 +625,7 @@ class Syslog extends IPSModule
         $default_severity = $this->ReadPropertyString('default_severity');
         $default_facility = $this->ReadPropertyString('default_facility');
         $default_program = $this->ReadPropertyString('default_program');
+        $syslog_format = $this->ReadPropertyInteger('syslog_format');
 
         if ($severity == null || $severity == '') {
             $severity = $default_severity;
@@ -632,10 +654,30 @@ class Syslog extends IPSModule
         $msgid = '-';
         $procid = '-';
         $sdata = '-';
-        // prefix msg with UTF8-BOM (Byte Order Mark) to inform the syslog that it is UTF8
-        $msg = chr(0xEF) . chr(0xBB) . chr(0xBF) . $msg;
 
-        $syslog_message = '<' . $pri . '>'
+        if ($syslog_format == self::$SYSLOG_FORMAT_BSD) {
+            $syslog_message = '<' . $pri . '>'
+            . '1'
+            . ' '
+            . $timestamp
+            . ' '
+            . $host
+            . ' '
+            . $program
+            . ' '
+            . $procid
+            . ' '
+            . $msgid
+            . ' '
+            . $sdata
+            . ': '
+            . $msg;
+        }
+
+        if ($syslog_format == self::$SYSLOG_FORMAT_IETF) {
+            // prefix msg with UTF8-BOM (Byte Order Mark) to inform the syslog that it is UTF8
+            $msg = chr(0xEF) . chr(0xBB) . chr(0xBF) . $msg;
+            $syslog_message = '<' . $pri . '>'
             . '1'
             . ' '
             . $timestamp
@@ -651,6 +693,7 @@ class Syslog extends IPSModule
             . $sdata
             . ' '
             . $msg;
+        }
 
         $this->SendDebug(__FUNCTION__, 'server=' . $server . ', port=' . $port . ', message="' . $syslog_message . '"', 0);
 

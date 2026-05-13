@@ -132,6 +132,10 @@ GUIDs
 
 ## 7. Versions-Historie
 
+- 2.20 @ 11.05.2026 15:02
+  - Fix: Änderung von deprecated php code
+  - update submodule CommonStubs
+
 - 2.19 @ 03.01.2025 14:17
   - Verbesserung: Unterstützung von BSD und IETF-Syslog-Format
   - interne Änderung

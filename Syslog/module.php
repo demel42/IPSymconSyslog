@@ -613,7 +613,7 @@ class Syslog extends IPSModule
         $this->SendDebug(__FUNCTION__, $this->PrintTimer('CheckMessages'), 0);
     }
 
-    public function Message(string $msg, string $severity = null, string $facility = null, string $program = null)
+    public function Message(string $msg, ?string $severity = null, ?string $facility = null, ?string $program = null)
     {
         if ($this->CheckStatus() == self::$STATUS_INVALID) {
             $this->SendDebug(__FUNCTION__, $this->GetStatusText() . ' => skip', 0);
